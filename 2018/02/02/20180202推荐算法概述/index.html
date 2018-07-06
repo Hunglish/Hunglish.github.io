@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+
+<script>
+    (function(){
+        if(''){
+            if (prompt('嚼得菜根:') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+</script>
+
+
+
+<meta name="baidu-site-verification" content="PNxFZ4OXUk" />
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="true" />
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true" />
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Algorithm," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="无所住而生其心" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="推荐系统概述和常用评价指标推荐系统的特点大家对推荐系统的普遍观点是：  重要性 &amp;gt; 数据 &amp;gt; 算法， 推荐系统中一味追求先进算法是个误区，通常论文中的推荐方法带有很多假设限制，有的考虑工程实现问题较少，推荐系统需要大量的数据整理和转化，同时更需要公司业务特性以及与现有系统的集成，方能形成推荐系统和业务之间的良性循环；  推荐系统离线测试很好，上线后要么没有严格的测试结果而只能凭感觉，要">
+<meta name="keywords" content="Algorithm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="推荐算法概述">
+<meta property="og:url" content="http://yoursite.com/2018/02/02/20180202推荐算法概述/index.html">
+<meta property="og:site_name" content="无所住而生其心">
+<meta property="og:description" content="推荐系统概述和常用评价指标推荐系统的特点大家对推荐系统的普遍观点是：  重要性 &amp;gt; 数据 &amp;gt; 算法， 推荐系统中一味追求先进算法是个误区，通常论文中的推荐方法带有很多假设限制，有的考虑工程实现问题较少，推荐系统需要大量的数据整理和转化，同时更需要公司业务特性以及与现有系统的集成，方能形成推荐系统和业务之间的良性循环；  推荐系统离线测试很好，上线后要么没有严格的测试结果而只能凭感觉，要">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-07-06T17:24:34.159Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="推荐算法概述">
+<meta name="twitter:description" content="推荐系统概述和常用评价指标推荐系统的特点大家对推荐系统的普遍观点是：  重要性 &amp;gt; 数据 &amp;gt; 算法， 推荐系统中一味追求先进算法是个误区，通常论文中的推荐方法带有很多假设限制，有的考虑工程实现问题较少，推荐系统需要大量的数据整理和转化，同时更需要公司业务特性以及与现有系统的集成，方能形成推荐系统和业务之间的良性循环；  推荐系统离线测试很好，上线后要么没有严格的测试结果而只能凭感觉，要">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '65HI0VE2NP',
+      apiKey: '6c2ac0dc2715b507fd4b7a708d88d7f5',
+      indexName: 'MyBlog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/02/02/20180202推荐算法概述/"/>
+
+
+
+
+
+  <title>推荐算法概述 | 无所住而生其心</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">无所住而生其心</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/02/20180202推荐算法概述/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="余洋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/author.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="无所住而生其心">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">推荐算法概述</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-02-02T14:28:13+08:00">
+                2018-02-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Machine-Learning/" itemprop="url" rel="index">
+                    <span itemprop="name">Machine Learning</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/02/02/20180202推荐算法概述/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/02/02/20180202推荐算法概述/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/02/02/20180202推荐算法概述/" class="leancloud_visitors" data-flag-title="推荐算法概述">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Heat&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+				 <span>℃</span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="推荐系统概述和常用评价指标"><a href="#推荐系统概述和常用评价指标" class="headerlink" title="推荐系统概述和常用评价指标"></a>推荐系统概述和常用评价指标</h3><h4 id="推荐系统的特点"><a href="#推荐系统的特点" class="headerlink" title="推荐系统的特点"></a>推荐系统的特点</h4><p>大家对推荐系统的普遍观点是：</p>
+<ul>
+<li><p>重要性 &gt; 数据 &gt; 算法， 推荐系统中一味追求先进算法是个误区，通常论文中的推荐方法带有很多假设限制，有的考虑工程实现问题较少，推荐系统需要大量的数据整理和转化，同时更需要公司业务特性以及与现有系统的集成，方能形成推荐系统和业务之间的良性循环；</p>
+</li>
+<li><p>推荐系统离线测试很好，上线后要么没有严格的测试结果而只能凭感觉，要么实际效果差强人意，我想主要缘于离线测试比较理想，而在线AB测试无论对于前端还是后台要求都很高，没有雄厚的研发实力难以实现；</p>
+</li>
+<li><p>推荐系统受到的外部干扰因素特别多（季节、流行因素等），整个系统需要不断的迭代更新，没有一劳永逸的事情。</p>
+</li>
+</ul>
+<h4 id="推荐系统的评价指标"><a href="#推荐系统的评价指标" class="headerlink" title="推荐系统的评价指标"></a>推荐系统的评价指标</h4><p>由于推荐系统比较复杂，所以涉及到的评价指标也很多。当然，用户满意度最为的有效，因为这本来就是推荐系统的最终目标，但是奈何资源有限成本太高，推荐系统还依赖于其它客观评价指标。</p>
+<ul>
+<li><p>推荐准确度：这个参数可以离线计算所得，而且较为的客观，所以是各大研究论文算法最重要的参考指标。总体来说，推荐系统有两大任务：“预测”和“推荐”，所以推荐系统准确度的评分包括：</p>
+<ul>
+<li>评分预测：学习用户的评价模型，用于预测用户对于未接触事物的评分，其实可以看作是一个回归模型，一般用均方根误差或者绝对误      差来衡量；</li>
+<li>TopN推荐：给用户一个个性化的推荐列表，其一般通过准确度、召回率等指标评估。其中N也是一个可变参数，可以根据不同的N描绘出      对应算法的ROC曲线来进一步评价推荐效果；</li>
+</ul>
+</li>
+<li><p>覆盖率：体现了挖掘算法对发掘长尾商品的能力。最简单的定义是，对所有用户推荐出的产品做并集，然后看这个出现的并集产品与总产品数中所占的比例，这种方式比较的粗线条，因为推荐系统中马太效应频繁，所以好的推荐算法应当是所有商品被推荐的几率差不多，都可以找到各自合适的用户，所以实际中会考虑信息熵、基尼系数等指标。</p>
+</li>
+<li><p>多样性：其原理可以表述为不在一棵树上吊死。因整个推荐系统涉及到的因素太多，如果只推荐用户一个类别的相似物品，失败风险比较的大，而且也难以实现整个推荐效益的最大化。</p>
+</li>
+<li><p>新颖性：原理就是那些用户没有接触过、没有操作过的商品，或者是流行度比较低的商品，对用户来说是比较新鲜的物品，往往会有意外的效果。个人觉得这个指标有点扯。</p>
+</li>
+<li><p>信任度：这个指标比较的主观，就是让用户信任推荐系统做出的推荐是有根据有理由的，以及推荐系统内部是如何运作的。例如亚马逊的商品推荐会给出推荐理由，作为用户的我会觉得很贴心，否则用户会觉得商家的利益驱动而带有抵触心理。</p>
+</li>
+<li><p>健壮性：比如针对关联推荐算法，商户恶意下单提高产品的推荐频率，水军恶意评论等。</p>
+</li>
+</ul>
+<h3 id="静态数据推荐"><a href="#静态数据推荐" class="headerlink" title="静态数据推荐"></a>静态数据推荐</h3><p>基本上绝大多数算法都会利用用户-产品的交互数据动态生成个性化的推荐。而静态数据指还没生成用户交互数据的时候，这种情况在系统冷启动的时候尤为的常见，常常使用的静态数据包括：</p>
+<pre><code>- 用户注册时候的性别、年龄、地域、学历、兴趣等人口统计学信息；
+- 授权的社交网络账号的好友信息；
+</code></pre><p>这类基于推荐方法简单，可以根据每类用户预先设置好推送内容，也可以根据同类用户相互之间进行推送，但是这种方法面临着推荐颗粒度较大，对于涉及个人品味爱好的个性化强的商品，参考价值有限，同时在大家隐私意识加强的情况下，这类数据不见得能够轻易得到；第二类社交网络好友信息效果会比较好，但也需要相应的平台授权接入才可以。</p>
+<p>然后这里引申出对于新加入的用户和新加入的商品的冷启动问题：</p>
+<p>新加入用户：推送热门商品；选择用上面人口统计信息进行粗粒度的推送；如果可以得到合作商数据，获取其好友信息，选择接近的好友进行UserCF推荐；向用户展示一些商品（热们常见、具有代表性和区分性、物品要多样性），得到用户的反馈，然后进行学习（Nadav Golbandi算法）；</p>
+<p>新加入商品：UserCF对新加入的物品冷启动不是很敏感，因为只要有用户发现这个新商品，这个新商品就会慢慢扩散开来。对于ItemCF就比较严重，比如可以考虑开始使用基于内容的推荐，等积累数据一定程度后切换成协同过滤推荐。</p>
+<h3 id="基于内容的推荐"><a href="#基于内容的推荐" class="headerlink" title="基于内容的推荐"></a>基于内容的推荐</h3><p>其主要根据用户之前的喜好，推荐相似的物品。该系统包括用户属性和产品属性两方面构成，前者包括用户的固有属性（比如人口统计信息）以及用户的历史商品交互信息（比如对看过电影的评分，然后得到该用户对于喜欢电影的属性描述），后者是对商品的本身属性描述，这样通过简单的余弦相似度就可以实现推荐了。同时也能感觉到，对于同类型的物品描述维度相似，这种算法会工作的比较好，对于电商千奇百怪的商品，可能工作效果一般。</p>
+<p>这个方法核心要解决的问题是推荐是否具有扩张性，如果根据用户之前的爱好只不断推荐同类的产品，显然整个推荐系统的价值就十分有限，但是如果能准确推荐其他不同类别的商品就会很好了。</p>
+<p>Pandora的音乐推荐就是个典型的基于内容的推荐系统，他们把音乐使用各种维度的属性进行描述，然后根据用户之前的兴趣爱好推荐相似属性风格的音乐。</p>
+<h3 id="协同过滤算法"><a href="#协同过滤算法" class="headerlink" title="协同过滤算法"></a>协同过滤算法</h3><p>协同过滤算法算是推荐系统中最经典的算法了，也称为基于领域的算法。协同过滤牵涉到用户和商品的交互信息，也就是用户行为，而一般用户对于商品的行为反馈有：<br>    显性反馈行为——用户明确表现出对某项产品和的喜好，比如用户对商品的打分、评论等信息。<br>    隐性反馈行为——不能明确代表用户对产品喜好的行为，比如页面浏览行为等，这类数据量的比较多，常常伴有大量的噪音，需要经过处理和转化才可能有实际的用途。</p>
+<p>而基于协同过滤的推荐又分为三个子类：</p>
+<ul>
+<li>基于用户的推荐(通过共同口味与偏好找相似邻居用户，K-邻居算法，你朋友喜欢，你也可能喜欢)，</li>
+<li>基于项目的推荐(发现物品之间的相似度，推荐类似的物品，你喜欢物品A，C与A相似，可能也喜欢C)，</li>
+<li>基于模型的推荐(基于样本的用户喜好信息构造一个推荐模型，然后根据实时的用户喜好信息预测推荐)。</li>
+</ul>
+<h3 id="基于标签的推荐方法"><a href="#基于标签的推荐方法" class="headerlink" title="基于标签的推荐方法"></a>基于标签的推荐方法</h3><p>基于标签的推荐算法也是十分常见的，比如豆瓣网、京东的商品评论等。标签信息一般分为专家、学者类打的标签；一类为普通用户给商品打的标签（UGC, User Generated Content）。</p>
+<p>而标签的内容一般要么描述商品本身的，比如名字、类别、产地等，也或者用户对商品的观点评价，比如便宜、好用、性能强等，三元组（用户、物品、标签）通过标签将用户和物品进行联系。</p>
+<p>基于标签推荐最简单的例子比如：统计一个用户最常用的标签，统计每个物品最常被打的标签，然后两者通过一定的关系推荐起来；当然也可以展现标签云，让用户点击自己感兴趣的标签，然后依此个性化推荐。</p>
+<p>国内的京东、淘宝、豆瓣都大量使用标签信息。</p>
+<p>由于标签的评价用户主观性比较强，所以一方面同样意思用户的用语差异性比较大，规范化可以考虑：用户评价的时候提供常用标签，让用户点击可以减少输入差异，而推荐的标签包括该物品描述性较好的标签，以及用户自己常用的标签（用户一致性）；人为或者通过自然语言处理技术对标签进行整理，对于用户积极和消极的评价进行区分；标签也有长尾分布效应，所以除了热门标签外怎么提取那些差异化的有用标签进行更精确的推荐也是应当研究的课题（卡方分布/SVD?）。</p>
+
+      
+    </div>
+    
+    
+    
+	
+	<div>
+		
+			<div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+		
+	</div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Algorithm/" <i class="fa fa-tag"></i> Algorithm</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/29/20180129平衡/" rel="next" title="平衡">
+                <i class="fa fa-chevron-left"></i> 平衡
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/17/20180217狗年思考总结/" rel="prev" title="狗年思考总结">
+                狗年思考总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/author.jpg"
+                alt="余洋" />
+            
+              <p class="site-author-name" itemprop="name">余洋</p>
+              <p class="site-description motion-element" itemprop="description">Done is better than perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">56</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/Hunglish" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:yu.panda.yang@gmail.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/sexyBoy/" target="_blank" title="知乎">
+                    
+                      <i class="fa fa-fw fa-twitter"></i>知乎</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+
+
+
+
+
+
+
+
+
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#推荐系统概述和常用评价指标"><span class="nav-number">1.</span> <span class="nav-text">推荐系统概述和常用评价指标</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#推荐系统的特点"><span class="nav-number">1.1.</span> <span class="nav-text">推荐系统的特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#推荐系统的评价指标"><span class="nav-number">1.2.</span> <span class="nav-text">推荐系统的评价指标</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#静态数据推荐"><span class="nav-number">2.</span> <span class="nav-text">静态数据推荐</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于内容的推荐"><span class="nav-number">3.</span> <span class="nav-text">基于内容的推荐</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#协同过滤算法"><span class="nav-number">4.</span> <span class="nav-text">协同过滤算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于标签的推荐方法"><span class="nav-number">5.</span> <span class="nav-text">基于标签的推荐方法</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">余洋</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count"></span>
+  
+</div>
+
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2018/02/02/20180202推荐算法概述/';
+          this.page.identifier = '2018/02/02/20180202推荐算法概述/';
+          this.page.title = '推荐算法概述';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("KNWjeXgELCzkAyNEk1ha6qat-gzGzoHsz", "DVvprAeUgywXSDutYxf0yQA8");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+  
+  <!-- 页面点击小红心 -->
+  <script type="text/javascript" src="/js/src/love.js"></script>
+</body>
+</html>

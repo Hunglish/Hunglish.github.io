@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+
+<script>
+    (function(){
+        if(''){
+            if (prompt('嚼得菜根:') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+</script>
+
+
+
+<meta name="baidu-site-verification" content="PNxFZ4OXUk" />
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="true" />
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true" />
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Database,Hive," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="无所住而生其心" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="介绍首先，我们来看看Hadoop的计算框架特性，在此特性下会衍生哪些问题？  数据量大不是问题，数据倾斜是个问题。 jobs数比较多的作业运行效率相对比较低，比如即使有几百行的表，如果多次关联多次汇总，产生十几个jobs，耗时很长。原因是map reduce作业初始化的时间是比较长的。 sum,count,max,min等UDAF，不怕数据倾斜问题, hadoop在map端的汇总合并优化，使数据倾">
+<meta name="keywords" content="Database,Hive">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hive性能优化Tips">
+<meta property="og:url" content="http://yoursite.com/2017/11/29/20171129Hive性能优化Tips/index.html">
+<meta property="og:site_name" content="无所住而生其心">
+<meta property="og:description" content="介绍首先，我们来看看Hadoop的计算框架特性，在此特性下会衍生哪些问题？  数据量大不是问题，数据倾斜是个问题。 jobs数比较多的作业运行效率相对比较低，比如即使有几百行的表，如果多次关联多次汇总，产生十几个jobs，耗时很长。原因是map reduce作业初始化的时间是比较长的。 sum,count,max,min等UDAF，不怕数据倾斜问题, hadoop在map端的汇总合并优化，使数据倾">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20171129HIVE01.png">
+<meta property="og:updated_time" content="2018-07-06T17:24:34.159Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hive性能优化Tips">
+<meta name="twitter:description" content="介绍首先，我们来看看Hadoop的计算框架特性，在此特性下会衍生哪些问题？  数据量大不是问题，数据倾斜是个问题。 jobs数比较多的作业运行效率相对比较低，比如即使有几百行的表，如果多次关联多次汇总，产生十几个jobs，耗时很长。原因是map reduce作业初始化的时间是比较长的。 sum,count,max,min等UDAF，不怕数据倾斜问题, hadoop在map端的汇总合并优化，使数据倾">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20171129HIVE01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '65HI0VE2NP',
+      apiKey: '6c2ac0dc2715b507fd4b7a708d88d7f5',
+      indexName: 'MyBlog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/29/20171129Hive性能优化Tips/"/>
+
+
+
+
+
+  <title>Hive性能优化Tips | 无所住而生其心</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">无所住而生其心</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/29/20171129Hive性能优化Tips/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="余洋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/author.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="无所住而生其心">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Hive性能优化Tips</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-29T21:51:33+08:00">
+                2017-11-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Coding/" itemprop="url" rel="index">
+                    <span itemprop="name">Coding</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/11/29/20171129Hive性能优化Tips/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/11/29/20171129Hive性能优化Tips/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/11/29/20171129Hive性能优化Tips/" class="leancloud_visitors" data-flag-title="Hive性能优化Tips">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Heat&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+				 <span>℃</span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>首先，我们来看看Hadoop的计算框架特性，在此特性下会衍生哪些问题？</p>
+<ul>
+<li>数据量大不是问题，数据倾斜是个问题。</li>
+<li>jobs数比较多的作业运行效率相对比较低，比如即使有几百行的表，如果多次关联多次汇总，产生十几个jobs，耗时很长。原因是map reduce作业初始化的时间是比较长的。</li>
+<li><font color="navy"><strong>sum,count,max,min等UDAF，不怕数据倾斜问题</strong></font>, hadoop在map端的汇总合并优化，使数据倾斜不成问题。</li>
+<li>count(distinct)在数据量大的情况下，效率较低，如果是多count(distinct )效率更低，因为<br>count(distinct)是按group by 字段分组，按distinct字段排序，一般这种分布方式是很倾斜的。举个例子：比如男uv,女uv，像淘宝一天30亿的pv，如果按性别分组，分配2个reduce,每个reduce处理15亿数据。
+　　</li>
+</ul>
+<p>面对这些问题，我们能有哪些有效的优化手段呢？下面列出一些在工作有效可行的优化手段：</p>
+<ul>
+<li>好的模型设计事半功倍。</li>
+<li>解决数据倾斜问题。</li>
+<li>减少job数。</li>
+<li>设置合理的map reduce的task数，能有效提升性能。(比如，10w+级别的计算，用160个reduce，那是相当的浪费，1个足够)。</li>
+<li>了解数据分布，自己动手解决数据倾斜问题是个不错的选择。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> hive.groupby.skewindata=<span class="literal">true</span>;</span><br></pre></td></tr></table></figure>
+<p>这是通用的算法优化，但算法优化有时不能适应特定业务背景，开发人员了解业务，了解数据，可以通过业务逻辑精确有效的解决数据倾斜问题。</p>
+<ul>
+<li>数据量较大的情况下，慎用count(distinct)，count(distinct)容易产生倾斜问题。</li>
+<li><font color="navy"><strong>对小文件进行合并</strong></font>，是行之有效的提高调度效率的方法，假如所有的作业设置合理的文件数，对云梯的整体调度效率也会产生积极的正向影响。</li>
+<li>优化时把握整体，单个作业最优不如整体最优。<br>　<br>而接下来，我们心中应该会有一些疑问，影响性能的根源是什么？</li>
+</ul>
+<h2 id="性能低下的根源"><a href="#性能低下的根源" class="headerlink" title="性能低下的根源"></a>性能低下的根源</h2><p>hive性能优化时，把HiveQL当做M/R程序来读，即从M/R的运行角度来考虑优化性能，从更底层思考如何优化运算性能，而不仅仅局限于逻辑代码的替换层面。</p>
+<p>RAC（Real Application Cluster）真正应用集群就像一辆机动灵活的小货车，响应快；Hadoop就像吞吐量巨大的轮船，启动开销大，如果每次只做小数量的输入输出，利用率将会很低。<font color="navy"><strong>所以用好Hadoop的首要任务是增大每次任务所搭载的数据量</strong></font>。</p>
+<p>Hadoop的核心能力是<strong>parition</strong>和<strong>sort</strong>，<font color="navy">因而这也是优化的根本</font>。</p>
+<p>观察Hadoop处理数据的过程，有几个显著的特征：</p>
+<ul>
+<li>数据的大规模并不是负载重点，<font color="navy"><strong>造成运行压力过大是因为运行数据的倾斜</strong></font>。</li>
+<li>jobs数比较多的作业运行效率相对比较低，比如即使有几百行的表，如果多次关联对此汇总，产生几十个jobs，将会需要30分钟以上的时间且大部分时间被用于作业分配，初始化和数据输出。M/R作业初始化的时间是比较耗时间资源的一个部分。</li>
+<li>在使用SUM，COUNT，MAX，MIN等UDAF函数时，不怕数据倾斜问题，Hadoop在Map端的汇总合并优化过，使数据倾斜不成问题。</li>
+<li>COUNT(DISTINCT)在数据量大的情况下，效率较低，如果多COUNT(DISTINCT)效率更低，因为COUNT(DISTINCT)是按GROUP BY字段分组，按DISTINCT字段排序，一般这种分布式方式是很倾斜的；比如：男UV，女UV，淘宝一天30亿的PV，如果按性别分组，分配2个reduce,每个reduce处理15亿数据。</li>
+<li>数据倾斜是导致效率大幅降低的主要原因，可以采用多一次 Map/Reduce 的方法， 避免倾斜。</li>
+</ul>
+<p>最后得出的结论是：<font color="navy"><strong>避实就虚，用 job 数的增加，输入量的增加，占用更多存储空间，充分利用空闲 CPU 等各种方法，分解数据倾斜造成的负担</strong></font>。</p>
+<h2 id="配置角度优化"><a href="#配置角度优化" class="headerlink" title="配置角度优化"></a>配置角度优化</h2><p>我们知道了性能低下的根源，同样，我们也可以从Hive的配置解读去优化。Hive系统内部已针对不同的查询预设定了优化方法，用户可以通过调整配置进行控制， 以下举例介绍部分优化的策略以及优化控制选项。</p>
+<h3 id="列剪裁"><a href="#列剪裁" class="headerlink" title="列剪裁"></a>列剪裁</h3><p>Hive 在读数据的时候，可以只读取查询中所需要用到的列，而忽略其它列。 例如，若有以下查询：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT a, b FROM q WHERE e &lt; 10</span><br></pre></td></tr></table></figure>
+<p>在实施此项查询中，Q 表有 5 列（a，b，c，d，e），Hive 只读取查询逻辑中真实需要 的 3 列 a、b、e，而忽略列 c，d；这样做节省了读取开销，中间表存储开销和数据整合开销。</p>
+<p>裁剪所对应的参数项为：hive.optimize.cp=true（默认值为真）</p>
+<h3 id="分区剪裁"><a href="#分区剪裁" class="headerlink" title="分区剪裁"></a>分区剪裁</h3><p>可以在查询的过程中减少不必要的分区，例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM (SELECTT a1,COUNT(1) FROM T GROUP BY a1) subq WHERE subq.prtn=100; <span class="comment">#（多余分区） </span></span><br><span class="line">SELECT * FROM T1 JOIN (SELECT * FROM T2) subq ON (T1.a1=subq.a2) WHERE subq.prtn=100;</span><br></pre></td></tr></table></figure>
+<p>查询语句若将“subq.prtn=100”条件放入子查询中更为高效，可以减少读入的分区数目。 Hive 自动执行这种裁剪优化。</p>
+<p>分区参数为：hive.optimize.pruner=true（默认值为真）</p>
+<h3 id="JOIN操作"><a href="#JOIN操作" class="headerlink" title="JOIN操作"></a>JOIN操作</h3><p>在编写带有 join 操作的代码语句时，应该将条目少的表/子查询放在 Join 操作符的左边。 因为在 Reduce 阶段，位于 Join 操作符左边的表的内容会被加载进内存，载入条目较少的表 可以有效减少 OOM（out of memory）即内存溢出。所以对于同一个 key 来说，对应的 value 值小的放前，大的放后，这便是“小表放前”原则。 若一条语句中有多个 Join，依据 Join 的条件相同与否，有不同的处理方法。</p>
+<h4 id="JOIN原则"><a href="#JOIN原则" class="headerlink" title="JOIN原则"></a>JOIN原则</h4><p>在使用写有 Join 操作的查询语句时有一条原则：<strong>应该将条目少的表/子查询放在 Join 操作符的左边。原因是在 Join 操作的 Reduce 阶段，位于 Join 操作符左边的表的内容会被加载进内存，将条目少的表放在左边，可以有效减少发生 OOM 错误的几率</strong>。对于一条语句中有多个 Join 的情况，如果 Join 的条件相同，比如查询：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">INSERT OVERWRITE TABLE pv_users </span><br><span class="line"> SELECT pv.pageid, u.age FROM page_view p </span><br><span class="line"> JOIN user u ON (pv.userid = u.userid) </span><br><span class="line"> JOIN newuser x ON (u.userid = x.userid);</span><br></pre></td></tr></table></figure>
+<p>如果 Join 的 key 相同，不管有多少个表，都会则会合并为一个Map-Reduce，而不是 ‘n’ 个，在做 OUTER JOIN 的时候也是一样。</p>
+<p>如果join的条件不同，比如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">INSERT OVERWRITE TABLE pv_users </span><br><span class="line">   SELECT pv.pageid, u.age FROM page_view p </span><br><span class="line">   JOIN user u ON (pv.userid = u.userid) </span><br><span class="line">   JOIN newuser x on (u.age = x.age);</span><br></pre></td></tr></table></figure>
+<p>   Map-Reduce 的任务数和Join操作的数目是对应的，上述查询和以下查询是等价的：</p>
+   <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">  INSERT OVERWRITE TABLE tmptable </span><br><span class="line">  SELECT * FROM page_view p JOIN user u </span><br><span class="line">  ON (pv.userid = u.userid);</span><br><span class="line">INSERT OVERWRITE TABLE pv_users </span><br><span class="line">  SELECT x.pageid, x.age FROM tmptable x </span><br><span class="line">  JOIN newuser y ON (x.age = y.age);</span><br></pre></td></tr></table></figure>
+<h3 id="Map-Join-操作"><a href="#Map-Join-操作" class="headerlink" title="Map Join 操作"></a>Map Join 操作</h3><p>Join 操作在 Map 阶段完成，不再需要Reduce，前提条件是需要的数据在 Map 的过程中可以访问到。比如查询： </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">INSERT OVERWRITE TABLE pv_users </span><br><span class="line">   SELECT /*+ MAPJOIN(pv) */ pv.pageid, u.age </span><br><span class="line">   FROM page_view pv </span><br><span class="line">     JOIN user u ON (pv.userid = u.userid);</span><br></pre></td></tr></table></figure>
+<p><strong><font color="navy">可以在 Map 阶段完成 Join，如图所示</font></strong></p>
+<p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20171129HIVE01.png" alt="创新扩散曲线"></p>
+<h3 id="4-5GROUP-BY操作"><a href="#4-5GROUP-BY操作" class="headerlink" title="4.5GROUP BY操作"></a>4.5GROUP BY操作</h3><p>进行GROUP BY操作时需要注意一下几点：</p>
+<ul>
+<li>Map端部分聚合</li>
+</ul>
+<p>事实上并不是所有的聚合操作都需要在reduce部分进行，很多聚合操作都可以先在Map端进行部分聚合，然后reduce端得出最终结果。</p>
+<p>这里需要修改的参数为：</p>
+<p>hive.map.aggr=true（用于设定是否在 map 端进行聚合，默认值为真） hive.groupby.mapaggr.checkinterval=100000（用于设定 map 端进行聚合操作的条目数）</p>
+<ul>
+<li>有数据倾斜时进行负载均衡<br>　　<br>此处需要设定 hive.groupby.skewindata，当选项设定为 true 是，生成的查询计划有两 个 MapReduce 任务。在第一个 MapReduce 中，map 的输出结果集合会随机分布到 reduce 中， 每个 reduce 做部分聚合操作，并输出结果。这样处理的结果是，相同的 Group By Key 有可 能分发到不同的 reduce 中，从而达到负载均衡的目的；第二个 MapReduce 任务再根据预处 理的数据结果按照 Group By Key 分布到 reduce 中（这个过程可以保证相同的 Group By Key 分布到同一个 reduce 中），最后完成最终的聚合操作。</li>
+</ul>
+<h3 id="合并小文件"><a href="#合并小文件" class="headerlink" title="合并小文件"></a>合并小文件</h3><p>我们知道文件数目小，容易在文件存储端造成瓶颈，给 HDFS 带来压力，影响处理效率。对此，可以通过合并Map和Reduce的结果文件来消除这样的影响。</p>
+<p>用于设置合并属性的参数有：</p>
+<ul>
+<li>是否合并Map输出文件：hive.merge.mapfiles=true（默认值为真）</li>
+<li>是否合并Reduce 端输出文件：hive.merge.mapredfiles=false（默认值为假）</li>
+<li>合并文件的大小：hive.merge.size.per.task=256<em>1000</em>1000（默认值为 256000000）</li>
+</ul>
+<h2 id="程序角度优化"><a href="#程序角度优化" class="headerlink" title="程序角度优化"></a>程序角度优化</h2><h3 id="熟练使用SQL提高查询"><a href="#熟练使用SQL提高查询" class="headerlink" title="熟练使用SQL提高查询"></a>熟练使用SQL提高查询</h3><p>熟练地使用 SQL，能写出高效率的查询语句。</p>
+<p>场景：有一张 user 表，为卖家每天收到表，user_id，ds（日期）为 key，属性有主营类目，指标有交易金额，交易笔数。每天要取前10天的总收入，总笔数，和最近一天的主营类目。 　　</p>
+<p>解决方法 1</p>
+<p>如下所示：常用方法</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">insert overwrite table t1</span><br><span class="line">select user_id, substr(MAX(CONCAT(ds, cat), 9) as main_cat) from users</span><br><span class="line"><span class="built_in">where</span> ds = 20120329 </span><br><span class="line">insert overwrite table t2</span><br><span class="line">select user_id, sum(qty) as qty, sum(amt) as amt from users</span><br><span class="line"><span class="built_in">where</span> ds between 20120301 and 20120329</span><br><span class="line">SELECT t1.user_id,t1.main_cat,t2.qty,t2.amt FROM t1 </span><br><span class="line">JOIN t2 ON t1.user_id=t2.user_id</span><br></pre></td></tr></table></figure>
+<p>下面给出方法1的思路，实现步骤如下：</p>
+<ul>
+<li><p>第一步：利用分析函数，取每个 user_id 最近一天的主营类目，存入临时表 t1。</p>
+</li>
+<li><p>第二步：汇总 10 天的总交易金额，交易笔数，存入临时表 t2。</p>
+</li>
+<li><p>第三步：关联 t1，t2，得到最终的结果。</p>
+</li>
+</ul>
+<p>解决方法2</p>
+<p>如下所示：优化方法</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT user_id,substr(MAX(CONCAT(ds,cat)),9) AS main_cat,SUM(qty),SUM(amt) FROM users </span><br><span class="line">WHERE ds BETWEEN 20120301 AND 20120329 </span><br><span class="line">GROUP BY user_id</span><br></pre></td></tr></table></figure>
+<p>在工作中我们总结出：方案 2 的开销等于方案 1 的第二步的开销，性能提升，由原有的 25 分钟完成，缩短为 10 分钟以内完成。节省了两个临时表的读写是一个关键原因，这种方式也适用于 Oracle 中的数据查找工作。 </p>
+<p>SQL 具有普适性，很多 SQL 通用的优化方案在 Hadoop 分布式计算方式中也可以达到效果。</p>
+<h3 id="无效ID在关联时的数据倾斜问题"><a href="#无效ID在关联时的数据倾斜问题" class="headerlink" title="无效ID在关联时的数据倾斜问题"></a>无效ID在关联时的数据倾斜问题</h3><p>问题：日志中常会出现信息丢失，比如每日约为 20 亿的全网日志，其中的 user_id 为主 键，在日志收集过程中会丢失，出现主键为 null 的情况，如果取其中的 user_id 和 bmw_users 关联，就会碰到数据倾斜的问题。原因是 Hive 中，主键为 null 值的项会被当做相同的 Key 而分配进同一个计算 Map。</p>
+<p>解决方法1： user_id 为空的不参与关联，子查询过滤null</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM <span class="built_in">log</span> a </span><br><span class="line">JOIN bmw_users b ON a.user_id IS NOT NULL AND a.user_id=b.user_id </span><br><span class="line">UNION All SELECT * FROM <span class="built_in">log</span> a WHERE a.user_id IS NULL</span><br></pre></td></tr></table></figure>
+<p>解决方法2：如下所示：函数过滤null。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM <span class="built_in">log</span> a LEFT OUTER </span><br><span class="line">JOIN bmw_users b ON </span><br><span class="line">CASE WHEN a.user_id IS NULL THEN CONCAT(‘dp_hive’,RAND()) ELSE a.user_id END =b.user_id;</span><br></pre></td></tr></table></figure>
+<p>调优结果：原先由于数据倾斜导致运行时长超过 1 小时，解决方法 1 运行每日平均时长 25 分钟，解决方法 2 运行的每日平均时长在 20 分钟左右。优化效果很明显。</p>
+<p>　　我们在工作中总结出：解决方法2比解决方法1效果更好，不但IO少了，而且作业数也少了。解决方法1中log读取两次，job 数为2。解决方法2中 job 数是1。这个优化适合无效 id（比如-99、 ‘’，null 等）产生的倾斜问题。把空值的 key 变成一个字符串加上随机数，就能把倾斜的 数据分到不同的Reduce上，从而解决数据倾斜问题。因为空值不参与关联，即使分到不同 的 Reduce 上，也不会影响最终的结果。附上 Hadoop 通用关联的实现方法是：关联通过二次排序实现的，关联的列为 partion key，关联的列和表的 tag 组成排序的 group key，根据 pariton key分配Reduce。同一Reduce内根据group key排序。
+　　</p>
+<h3 id="不同数据类型关联产生的倾斜问题"><a href="#不同数据类型关联产生的倾斜问题" class="headerlink" title="不同数据类型关联产生的倾斜问题"></a>不同数据类型关联产生的倾斜问题</h3><p>问题：不同数据类型 id 的关联会产生数据倾斜问题。</p>
+<p>一张表 s8 的日志，每个商品一条记录，要和商品表关联。但关联却碰到倾斜的问题。 s8 的日志中有 32 为字符串商品 id，也有数值商品 id，日志中类型是 string 的，但商品中的 数值 id 是 bigint 的。猜想问题的原因是把 s8 的商品 id 转成数值 id 做 hash 来分配 Reduce， 所以字符串 id 的 s8 日志，都到一个 Reduce 上了，解决的方法验证了这个猜测。</p>
+<p>解决方法：把数据类型转换成字符串类型</p>
+<pre><code>SELECT * FROM s8_log a LEFT OUTER 
+JOIN r_auction_auctions b ON a.auction_id=CASE(b.auction_id AS STRING) 
+</code></pre><p>调优结果显示：数据表处理由 1 小时 30 分钟经代码调整后可以在 20 分钟内完成。</p>
+<h3 id="利用Hive对UNION-ALL优化的特性"><a href="#利用Hive对UNION-ALL优化的特性" class="headerlink" title="利用Hive对UNION ALL优化的特性"></a>利用Hive对UNION ALL优化的特性</h3><p>多表 union all 会优化成一个 job。</p>
+<p>问题：比如推广效果表要和商品表关联，效果表中的 auction_id 列既有 32 为字符串商 品 id，也有数字 id，和商品表关联得到商品的信息。</p>
+<p>解决方法：Hive SQL 性能会比较好</p>
+<pre><code>SELECT * FROM effect a 
+JOIN 
+(SELECT auction_id AS auction_id FROM auctions 
+UNION All 
+SELECT auction_string_id AS auction_id FROM auctions) b 
+ON a.auction_id=b.auction_id 
+</code></pre><p>比分别过滤数字 id，字符串 id 然后分别和商品表关联性能要好。</p>
+<p>这样写的好处：1 个 MapReduce 作业，商品表只读一次，推广效果表只读取一次。把 这个 SQL 换成 Map/Reduce 代码的话，Map 的时候，把 a 表的记录打上标签 a，商品表记录 每读取一条，打上标签 b，变成两个&lt;key,value&gt;对，&lt;(b,数字 id),value&gt;，&lt;(b,字符串 id),value&gt;。</p>
+<p>所以商品表的 HDFS 读取只会是一次。</p>
+<h3 id="解决Hive对UNION-ALL优化的短板"><a href="#解决Hive对UNION-ALL优化的短板" class="headerlink" title="解决Hive对UNION ALL优化的短板"></a>解决Hive对UNION ALL优化的短板</h3><p>Hive 对 union all 的优化的特性：对 union all 优化只局限于非嵌套查询。</p>
+<p>消灭子查询内的 group by</p>
+<p>示例 1：子查询内有 group by </p>
+<pre><code>SELECT * FROM 
+(SELECT * FROM t1 GROUP BY c1,c2,c3 UNION ALL SELECT * FROM t2 GROUP BY     c1,c2,c3)t3 
+GROUP BY c1,c2,c3 
+</code></pre><p>从业务逻辑上说，子查询内的 GROUP BY 怎么都看显得多余（功能上的多余，除非有 COUNT(DISTINCT)），如果不是因为 Hive Bug 或者性能上的考量（曾经出现如果不执行子查询 GROUP BY，数据得不到正确的结果的 Hive Bug）。所以这个 Hive 按经验转换成如下所示：</p>
+<pre><code>SELECT * FROM (SELECT * FROM t1 UNION ALL SELECT * FROM t2)t3 GROUP BY c1,c2,c3 
+</code></pre><p>调优结果：经过测试，并未出现 union all 的 Hive Bug，数据是一致的。MapReduce 的 作业数由 3 减少到 1。 </p>
+<p>t1 相当于一个目录，t2 相当于一个目录，对 Map/Reduce 程序来说，t1，t2 可以作为 Map/Reduce 作业的 mutli inputs。这可以通过一个 Map/Reduce 来解决这个问题。Hadoop 的 计算框架，不怕数据多，就怕作业数多。</p>
+<p>但如果换成是其他计算平台如 Oracle，那就不一定了，因为把大的输入拆成两个输入， 分别排序汇总后 merge（假如两个子排序是并行的话），是有可能性能更优的（比如希尔排 序比冒泡排序的性能更优）。</p>
+<p>消灭子查询内的 COUNT(DISTINCT)，MAX，MIN。</p>
+<pre><code>SELECT * FROM 
+(SELECT * FROM t1 
+UNION ALL SELECT c1,c2,c3 COUNT(DISTINCT c4) FROM t2 GROUP BY c1,c2,c3) t3 
+GROUP BY c1,c2,c3; 
+</code></pre><p>由于子查询里头有 COUNT(DISTINCT)操作，直接去 GROUP BY 将达不到业务目标。这时采用 临时表消灭 COUNT(DISTINCT)作业不但能解决倾斜问题，还能有效减少 jobs。</p>
+<p>job 数是 2，减少一半，而且两次 Map/Reduce 比 COUNT(DISTINCT)效率更高。</p>
+<p>调优结果：千万级别的类目表，member 表，与 10 亿级得商品表关联。原先 1963s 的任务经过调整，1152s 即完成。</p>
+<p>消灭子查询内的 JOIN</p>
+<pre><code>SELECT * FROM 
+(SELECT * FROM t1 UNION ALL SELECT * FROM t4 UNION ALL SELECT * FROM t2 JOIN t3 ON     t2.id=t3.id) x 
+GROUP BY c1,c2; 
+</code></pre><p>上面代码运行会有 5 个 jobs。加入先 JOIN 生存临时表的话 t5，然后 UNION ALL，会变成 2 个 jobs。</p>
+<pre><code>INSERT OVERWRITE TABLE t5 
+SELECT * FROM t2 JOIN t3 ON t2.id=t3.id; 
+SELECT * FROM (t1 UNION ALL t4 UNION ALL t5); 
+</code></pre><p>调优结果显示：针对千万级别的广告位表，由原先 5 个 Job 共 15 分钟，分解为 2 个 job 一个 8-10 分钟，一个3分钟。</p>
+<h3 id="GROUP-BY替代COUNT-DISTINCT-达到优化效果"><a href="#GROUP-BY替代COUNT-DISTINCT-达到优化效果" class="headerlink" title="GROUP BY替代COUNT(DISTINCT)达到优化效果"></a>GROUP BY替代COUNT(DISTINCT)达到优化效果</h3><p>计算 uv 的时候，经常会用到 COUNT(DISTINCT)，但在数据比较倾斜的时候 COUNT(DISTINCT) 会比较慢。这时可以尝试用 GROUP BY 改写代码计算 uv</p>
+<p>原有代码</p>
+<pre><code>INSERT OVERWRITE TABLE s_dw_tanx_adzone_uv PARTITION (ds=20120329) 
+SELECT 20120329 AS thedate,adzoneid,COUNT(DISTINCT acookie) AS uv FROM     s_ods_log_tanx_pv t WHERE t.ds=20120329 GROUP BY adzoneid
+</code></pre><p>关于COUNT(DISTINCT)的数据倾斜问题不能一概而论，要依情况而定，下面是我测试的一组数据：<br>测试数据：169857条</p>
+<pre><code>#统计每日IP 
+CREATE TABLE ip_2014_12_29 AS SELECT COUNT(DISTINCT ip) AS IP FROM logdfs WHERE     logdate=&apos;2014_12_29&apos;; 
+耗时：24.805 seconds 
+#统计每日IP（改造） 
+CREATE TABLE ip_2014_12_29 AS SELECT COUNT(1) AS IP FROM (SELECT DISTINCT ip from     logdfs WHERE logdate=&apos;2014_12_29&apos;) tmp; 
+耗时：46.833 seconds
+</code></pre><p>测试结果表名：明显改造后的语句比之前耗时，这是因为改造后的语句有2个SELECT，多了一个job，这样在数据量小的时候，数据不会存在倾斜问题。</p>
+<h2 id="优化总结"><a href="#优化总结" class="headerlink" title="优化总结"></a>优化总结</h2><p>优化时，把hive sql当做mapreduce程序来读，会有意想不到的惊喜。理解hadoop的核心能力，是hive优化的根本。这是这一年来，项目组所有成员宝贵的经验总结。</p>
+<p>长期观察hadoop处理数据的过程，有几个显著的特征:</p>
+<ul>
+<li><p>不怕数据多，就怕数据倾斜。</p>
+</li>
+<li><p>对jobs数比较多的作业运行效率相对比较低，比如即使有几百行的表，如果多次关联多次汇总，产生十几个jobs，没半小时是跑不完的。map reduce作业初始化的时间是比较长的。</p>
+</li>
+<li><p>对sum，count来说，不存在数据倾斜问题。</p>
+</li>
+<li><p>对count(distinct ),效率较低，数据量一多，准出问题，如果是多count(distinct )效率更低。</p>
+</li>
+</ul>
+<p>优化可以从几个方面着手：</p>
+<ul>
+<li><p>好的模型设计事半功倍。</p>
+</li>
+<li><p>解决数据倾斜问题。</p>
+</li>
+<li><p>减少job数。</p>
+</li>
+<li><p>设置合理的map reduce的task数，能有效提升性能。(比如，10w+级别的计算，用160个reduce，那是相当的浪费，1个足够)。</p>
+</li>
+<li><p>自己动手写sql解决数据倾斜问题是个不错的选择。set hive.groupby.skewindata=true;这是通用的算法优化，但算法优化总是漠视业务，习惯性提供通用的解决方法。 Etl开发人员更了解业务，更了解数据，所以通过业务逻辑解决倾斜的方法往往更精确，更有效。</p>
+</li>
+<li><p>对count(distinct)采取漠视的方法，尤其数据大的时候很容易产生倾斜问题，不抱侥幸心理。自己动手，丰衣足食。</p>
+</li>
+<li><p>对小文件进行合并，是行至有效的提高调度效率的方法，假如我们的作业设置合理的文件数，对云梯的整体调度效率也会产生积极的影响。</p>
+</li>
+</ul>
+<p><font color="navy"><strong>优化时把握整体，单个作业最优不如整体最优</strong></font>。</p>
+<h2 id="优化的常用手段"><a href="#优化的常用手段" class="headerlink" title="优化的常用手段"></a>优化的常用手段</h2><p>主要由三个属性来决定：</p>
+<ul>
+<li><p>hive.exec.reducers.bytes.per.reducer   ＃这个参数控制一个job会有多少个reducer来处理，依据的是输入文件的总大小。默认1GB。</p>
+</li>
+<li><p>hive.exec.reducers.max    ＃这个参数控制最大的reducer的数量， 如果 input / bytes per reduce &gt; max  则会启动这个参数所指定的reduce个数。  这个并不会影响mapre.reduce.tasks参数的设置。默认的max是999。</p>
+</li>
+<li><p>mapred.reduce.tasks ＃这个参数如果指定了，hive就不会用它的estimation函数来自动计算reduce的个数，而是用这个参数来启动reducer。默认是-1。</p>
+</li>
+</ul>
+<h3 id="参数设置的影响"><a href="#参数设置的影响" class="headerlink" title="参数设置的影响"></a>参数设置的影响</h3><p>　　<br>如果reduce太少：如果数据量很大，会导致这个reduce异常的慢，从而导致这个任务不能结束，也有可能会OOM 2、如果reduce太多：  产生的小文件太多，合并起来代价太高，namenode的内存占用也会增大。如果我们不指定mapred.reduce.tasks， hive会自动计算需要多少个reducer。</p>
+
+      
+    </div>
+    
+    
+    
+	
+	<div>
+		
+			<div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+		
+	</div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Database/" <i class="fa fa-tag"></i> Database</a>
+          
+            <a href="/tags/Hive/" <i class="fa fa-tag"></i> Hive</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/27/20171127Hive优化过程思路/" rel="next" title="Hive优化过程思路">
+                <i class="fa fa-chevron-left"></i> Hive优化过程思路
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/06/20171206浅谈数据仓库建设/" rel="prev" title="浅谈数据仓库建设">
+                浅谈数据仓库建设 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/author.jpg"
+                alt="余洋" />
+            
+              <p class="site-author-name" itemprop="name">余洋</p>
+              <p class="site-description motion-element" itemprop="description">Done is better than perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">56</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/Hunglish" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:yu.panda.yang@gmail.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/sexyBoy/" target="_blank" title="知乎">
+                    
+                      <i class="fa fa-fw fa-twitter"></i>知乎</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+
+
+
+
+
+
+
+
+
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#性能低下的根源"><span class="nav-number">2.</span> <span class="nav-text">性能低下的根源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置角度优化"><span class="nav-number">3.</span> <span class="nav-text">配置角度优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#列剪裁"><span class="nav-number">3.1.</span> <span class="nav-text">列剪裁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分区剪裁"><span class="nav-number">3.2.</span> <span class="nav-text">分区剪裁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JOIN操作"><span class="nav-number">3.3.</span> <span class="nav-text">JOIN操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#JOIN原则"><span class="nav-number">3.3.1.</span> <span class="nav-text">JOIN原则</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Map-Join-操作"><span class="nav-number">3.4.</span> <span class="nav-text">Map Join 操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5GROUP-BY操作"><span class="nav-number">3.5.</span> <span class="nav-text">4.5GROUP BY操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#合并小文件"><span class="nav-number">3.6.</span> <span class="nav-text">合并小文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#程序角度优化"><span class="nav-number">4.</span> <span class="nav-text">程序角度优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#熟练使用SQL提高查询"><span class="nav-number">4.1.</span> <span class="nav-text">熟练使用SQL提高查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无效ID在关联时的数据倾斜问题"><span class="nav-number">4.2.</span> <span class="nav-text">无效ID在关联时的数据倾斜问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不同数据类型关联产生的倾斜问题"><span class="nav-number">4.3.</span> <span class="nav-text">不同数据类型关联产生的倾斜问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#利用Hive对UNION-ALL优化的特性"><span class="nav-number">4.4.</span> <span class="nav-text">利用Hive对UNION ALL优化的特性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决Hive对UNION-ALL优化的短板"><span class="nav-number">4.5.</span> <span class="nav-text">解决Hive对UNION ALL优化的短板</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GROUP-BY替代COUNT-DISTINCT-达到优化效果"><span class="nav-number">4.6.</span> <span class="nav-text">GROUP BY替代COUNT(DISTINCT)达到优化效果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优化总结"><span class="nav-number">5.</span> <span class="nav-text">优化总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优化的常用手段"><span class="nav-number">6.</span> <span class="nav-text">优化的常用手段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参数设置的影响"><span class="nav-number">6.1.</span> <span class="nav-text">参数设置的影响</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">余洋</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count"></span>
+  
+</div>
+
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/11/29/20171129Hive性能优化Tips/';
+          this.page.identifier = '2017/11/29/20171129Hive性能优化Tips/';
+          this.page.title = 'Hive性能优化Tips';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("KNWjeXgELCzkAyNEk1ha6qat-gzGzoHsz", "DVvprAeUgywXSDutYxf0yQA8");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+  
+  <!-- 页面点击小红心 -->
+  <script type="text/javascript" src="/js/src/love.js"></script>
+</body>
+</html>

@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+
+<script>
+    (function(){
+        if(''){
+            if (prompt('嚼得菜根:') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+</script>
+
+
+
+<meta name="baidu-site-verification" content="PNxFZ4OXUk" />
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="true" />
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true" />
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Algorithm,NLP," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="无所住而生其心" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="所谓自动摘要，就是从文章中自动抽取关键句。何谓关键句？人类的理解是能够概括文章中心的句子，机器的理解只能模拟人类的理解，即拟定一个权重的评分标准，给每个句子打分，之后给出排名靠前的几个句子。 相似度计算TextRank的打分思想依然是从PageRank的迭代思想衍生过来的，如下公式所示：  等式左边表示一个句子的权重（WS是weight_sum的缩写），右侧的求和表示每个相邻句子对本句子的贡献程度">
+<meta name="keywords" content="Algorithm,NLP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TextRank摘要算法实现原理">
+<meta property="og:url" content="http://yoursite.com/2018/05/31/20180531TextRank摘要算法实现原理/index.html">
+<meta property="og:site_name" content="无所住而生其心">
+<meta property="og:description" content="所谓自动摘要，就是从文章中自动抽取关键句。何谓关键句？人类的理解是能够概括文章中心的句子，机器的理解只能模拟人类的理解，即拟定一个权重的评分标准，给每个句子打分，之后给出排名靠前的几个句子。 相似度计算TextRank的打分思想依然是从PageRank的迭代思想衍生过来的，如下公式所示：  等式左边表示一个句子的权重（WS是weight_sum的缩写），右侧的求和表示每个相邻句子对本句子的贡献程度">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180531TR-02.jpg">
+<meta property="og:updated_time" content="2018-07-06T17:24:34.159Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TextRank摘要算法实现原理">
+<meta name="twitter:description" content="所谓自动摘要，就是从文章中自动抽取关键句。何谓关键句？人类的理解是能够概括文章中心的句子，机器的理解只能模拟人类的理解，即拟定一个权重的评分标准，给每个句子打分，之后给出排名靠前的几个句子。 相似度计算TextRank的打分思想依然是从PageRank的迭代思想衍生过来的，如下公式所示：  等式左边表示一个句子的权重（WS是weight_sum的缩写），右侧的求和表示每个相邻句子对本句子的贡献程度">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180531TR-02.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '65HI0VE2NP',
+      apiKey: '6c2ac0dc2715b507fd4b7a708d88d7f5',
+      indexName: 'MyBlog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/05/31/20180531TextRank摘要算法实现原理/"/>
+
+
+
+
+
+  <title>TextRank摘要算法实现原理 | 无所住而生其心</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">无所住而生其心</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/31/20180531TextRank摘要算法实现原理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="余洋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/author.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="无所住而生其心">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">TextRank摘要算法实现原理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-31T19:09:49+08:00">
+                2018-05-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Machine-Learning/" itemprop="url" rel="index">
+                    <span itemprop="name">Machine Learning</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/05/31/20180531TextRank摘要算法实现原理/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/05/31/20180531TextRank摘要算法实现原理/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/05/31/20180531TextRank摘要算法实现原理/" class="leancloud_visitors" data-flag-title="TextRank摘要算法实现原理">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Heat&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+				 <span>℃</span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>所谓自动摘要，就是从文章中自动抽取关键句。何谓关键句？人类的理解是能够概括文章中心的句子，机器的理解只能模拟人类的理解，即拟定一个权重的评分标准，给每个句子打分，之后给出排名靠前的几个句子。</p>
+<h4 id="相似度计算"><a href="#相似度计算" class="headerlink" title="相似度计算"></a>相似度计算</h4><p>TextRank的打分思想依然是从PageRank的迭代思想衍生过来的，如下公式所示：</p>
+<p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180531TR-02.jpg" alt="创新扩散曲线"></p>
+<p>等式左边表示一个句子的权重（WS是weight_sum的缩写），右侧的求和表示每个相邻句子对本句子的贡献程度。与提取关键字的时候不同，一般认为<font color="red"><strong>全部句子都是相邻的</strong></font>，不再提取窗口。</p>
+<p>求和的分子wji表示两个句子的相似程度，分母又是一个weight_sum，而WS(Vj)代表上次迭代j的权重。整个公式是一个迭代的过程。</p>
+<h4 id="相似度计算-1"><a href="#相似度计算-1" class="headerlink" title="相似度计算"></a>相似度计算</h4><p>而相似程度Wij的计算，推荐使用BM25</p>
+<p>BM25算法，通常用来作搜索相关性评分。一句话概况其主要思想：对Query进行语素解析，生成语素qi；然后，对于每个搜索结果D，计算每个语素qi与D的相关性得分，最后，将qi相对于D的相关性得分进行加权求和，从而得到Query与D的相关性得分。</p>
+<p><a href="https://www.jianshu.com/p/1e498888f505" target="_blank" rel="noopener">算法连接</a></p>
+<h4 id="测试用例"><a href="#测试用例" class="headerlink" title="测试用例"></a>测试用例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">算法可大致分为基本算法、数据结构的算法、数论算法、计算几何的算法、图的算法、动态规划以及数值分析、加密算法、排序算法、检索算法、随机化算法、并行算法、厄米变形模型、随机森林算法。</span><br><span class="line"></span><br><span class="line">算法可以宽泛的分为三类，</span><br><span class="line"></span><br><span class="line">一，有限的确定性算法，这类算法在有限的一段时间内终止。他们可能要花很长时间来执行指定的任务，但仍将在一定的时间内终止。这类算法得出的结果常取决于输入值。</span><br><span class="line"></span><br><span class="line">二，有限的非确定算法，这类算法在有限的时间内终止。然而，对于一个（或一些）给定的数值，算法的结果并不是唯一的或确定的。</span><br><span class="line"></span><br><span class="line">三，无限的算法，是那些由于没有定义终止定义条件，或定义的条件无法由输入的数据满足而不终止运行的算法。通常，无限算法的产生是由于未能确定的定义终止条件。</span><br></pre></td></tr></table></figure>
+<h4 id="断句"><a href="#断句" class="headerlink" title="断句"></a>断句</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">算法可大致分为基本算法、数据结构的算法、数论算法、计算几何的算法、图的算法、动态规划以及数值分析、加密算法、排序算法、检索算法、随机化算法、并行算法、厄米变形模型、随机森林算法</span><br><span class="line">算法可以宽泛的分为三类</span><br><span class="line">一</span><br><span class="line">有限的确定性算法</span><br><span class="line">这类算法在有限的一段时间内终止</span><br><span class="line">他们可能要花很长时间来执行指定的任务</span><br><span class="line">但仍将在一定的时间内终止</span><br><span class="line">这类算法得出的结果常取决于输入值</span><br><span class="line">二</span><br><span class="line">有限的非确定算法</span><br><span class="line">这类算法在有限的时间内终止</span><br><span class="line">然而</span><br><span class="line">对于一个（或一些）给定的数值</span><br><span class="line">算法的结果并不是唯一的或确定的</span><br><span class="line">三</span><br><span class="line">无限的算法</span><br><span class="line">是那些由于没有定义终止定义条件</span><br><span class="line">或定义的条件无法由输入的数据满足而不终止运行的算法</span><br><span class="line">通常</span><br><span class="line">无限算法的产生是由于未能确定的定义终止条件</span><br></pre></td></tr></table></figure>
+<h4 id="分词并过滤停用词"><a href="#分词并过滤停用词" class="headerlink" title="分词并过滤停用词"></a>分词并过滤停用词</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[算法, 大致, 分, 基本, 算法, 数据, 结构, 算法, 数论, 算法, 计算, 几何, 算法, 图, 算法, 动态, 规划, 数值, 分析, 加密, 算法, 排序, 算法, 检索, 算法, 随机, 化, 算法, 并行, 算法, 厄, 米, 变形, 模型, 随机, 森林, 算法]</span><br><span class="line">[算法, 宽泛, 分为, 三类]</span><br><span class="line">[]</span><br><span class="line">[有限, 确定性, 算法]</span><br><span class="line">[类, 算法, 有限, 一段, 时间, 终止]</span><br><span class="line">[可能, 花, 长, 时间, 执行, 指定, 任务]</span><br><span class="line">[一定, 时间, 终止]</span><br><span class="line">[类, 算法, 得出, 常, 取决, 输入, 值]</span><br><span class="line">[二]</span><br><span class="line">[有限, 非, 确定, 算法]</span><br><span class="line">[类, 算法, 有限, 时间, 终止]</span><br><span class="line">[]</span><br><span class="line">[一个, 定, 数值]</span><br><span class="line">[算法, 唯一, 确定]</span><br><span class="line">[三]</span><br><span class="line">[无限, 算法]</span><br><span class="line">[没有, 定义, 终止, 定义, 条件]</span><br><span class="line">[定义, 条件, 无法, 输入, 数据, 满足, 终止, 运行, 算法]</span><br><span class="line">[通常]</span><br><span class="line">[无限, 算法, 产生, 未, 确定, 定义, 终止, 条件]</span><br></pre></td></tr></table></figure>
+<h4 id="计算BM25相关矩阵"><a href="#计算BM25相关矩阵" class="headerlink" title="计算BM25相关矩阵"></a>计算BM25相关矩阵</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[15.176530737482341, -2.604484103028904, 0.0, -2.8740684265166565, -2.1930693258940175, 0.0, 0.0, -2.0325355810136103, 0.0, -2.604484103028904, -2.3811362523642052, 0.0, 2.509043358515279, -2.8740684265166565, 0.0, -3.2059044218809922, 0.0, -0.22517864251663589, 0.0, -1.8939010965185548]</span><br><span class="line">[-0.2864022115473306, 8.52437122545896, 0.0, -0.23950570220972142, -0.18275577715783484, 0.0, 0.0, -0.1693779650844675, 0.0, -0.21704034191907534, -0.19842802103035043, 0.0, 0.0, -0.23950570220972142, 0.0, -0.267158701823416, 0.0, -0.1477475757866994, 0.0, -0.15782509137654627]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, 4.604672851367114, 1.060086217315166, 0.0, 0.0, -0.1693779650844675, 0.0, 1.2589559610532894, 1.1509940396671094, 0.0, 0.0, -0.23950570220972142, 0.0, -0.267158701823416, 0.0, -0.1477475757866994, 0.0, -0.15782509137654627]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, 1.3892676764009562, 7.063472116341414, 1.1518653539666401, 2.634590118176154, 1.2574519044179069, 0.0, 1.2589559610532894, 5.005270773642655, 0.0, 0.0, -0.23950570220972142, 0.0, -0.267158701823416, 0.8333088661764476, 0.4727261064071153, 0.0, 0.504969645305668]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 1.2428419944730007, 14.795434933306574, 1.6287733786106775, 0.0, 0.0, 0.0, 1.3494220606974598, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 2.010334451736872, 1.1518653539666401, 5.849995293142312, 0.0, 0.0, 0.0, 2.1827309268739077, 0.0, 0.0, 0.0, 0.0, 0.0, 0.8333088661764476, 0.6204736821938147, 0.0, 0.6627947366822143]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, -0.23950570220972142, 1.356767982871274, 0.0, 0.0, 12.127555522767913, 0.0, -0.21704034191907534, 1.4731177860712878, 0.0, 0.0, -0.23950570220972142, 0.0, -0.267158701823416, 0.0, 1.4000446911370572, 0.0, -0.15782509137654627]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.054814792796337, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, 1.3892676764009562, 1.060086217315166, 0.0, 0.0, -0.1693779650844675, 0.0, 6.001094704342757, 1.1509940396671094, 0.0, 0.0, 1.7780760396570634, 0.0, -0.267158701823416, 0.0, -0.1477475757866994, 0.0, 1.1716840594784514]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, 1.3892676764009562, 4.609944429081147, 1.1518653539666401, 2.634590118176154, 1.2574519044179069, 0.0, 1.2589559610532894, 5.005270773642655, 0.0, 0.0, -0.23950570220972142, 0.0, -0.267158701823416, 0.8333088661764476, 0.4727261064071153, 0.0, 0.504969645305668]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span><br><span class="line">[0.5551884973225691, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 8.939853708447595, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, -0.23950570220972142, -0.18275577715783484, 0.0, 0.0, -0.1693779650844675, 0.0, 1.611294545577714, -0.19842802103035043, 0.0, 0.0, 4.9934812146232215, 0.0, -0.267158701823416, 0.0, -0.1477475757866994, 0.0, 1.1716840594784514]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.054814792796337, 0.0, 0.0, 0.0, 0.0, 0.0]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, -0.23950570220972142, -0.18275577715783484, 0.0, 0.0, -0.1693779650844675, 0.0, -0.21704034191907534, -0.19842802103035043, 0.0, 0.0, -0.23950570220972142, 0.0, 2.531575358765468, 0.0, -0.1477475757866994, 0.0, 1.4955384555950606]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 0.7674924572638717, 0.0, 1.0058167395654765, 0.0, 0.0, 0.0, 0.8333088661764476, 0.0, 0.0, 0.0, 0.0, 0.0, 9.892547495751218, 4.354323965031352, 0.0, 4.651322189247207]</span><br><span class="line">[0.26878628577523855, -0.21704034191907534, 0.0, -0.23950570220972142, 0.5847366801060369, 0.0, 1.0058167395654765, 1.6050126003722507, 0.0, -0.21704034191907534, 0.6348808451460972, 0.0, 0.0, -0.23950570220972142, 0.0, -0.267158701823416, 4.866735958438866, 12.008153881124132, 0.0, 3.1639879470156633]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.054814792796337, 0.0]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, -0.23950570220972142, 0.5847366801060369, 0.0, 1.0058167395654765, -0.1693779650844675, 0.0, 1.611294545577714, 0.6348808451460972, 0.0, 0.0, 1.7780760396570634, 0.0, 2.531575358765468, 4.866735958438866, 2.9619596282988065, 0.0, 10.38451854500608]</span><br></pre></td></tr></table></figure>
+<h4 id="迭代投票"><a href="#迭代投票" class="headerlink" title="迭代投票"></a>迭代投票</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">for (int _ = 0; _ &lt; max_iter; ++_)</span><br><span class="line">&#123;</span><br><span class="line">    double[] m = new double[D];</span><br><span class="line">    double max_diff = 0;</span><br><span class="line">    for (int i = 0; i &lt; D; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        m[i] = 1 - d;</span><br><span class="line">        for (int j = 0; j &lt; D; ++j)</span><br><span class="line">        &#123;</span><br><span class="line">            if (j == i || weight_sum[j] == 0) continue;</span><br><span class="line">            m[i] += (d * weight[j][i] / weight_sum[j] * vertex[j]);</span><br><span class="line">        &#125;</span><br><span class="line">        double diff = Math.abs(m[i] - vertex[i]);</span><br><span class="line">        if (diff &gt; max_diff)</span><br><span class="line">        &#123;</span><br><span class="line">            max_diff = diff;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    vertex = m;</span><br><span class="line">    if (max_diff &lt;= min_diff) break;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="输出排序结果"><a href="#输出排序结果" class="headerlink" title="输出排序结果"></a>输出排序结果</h4><ul>
+<li>这类算法在有限的时间内终止</li>
+<li>这类算法在有限的一段时间内终止</li>
+<li>无限算法的产生是由于未能确定的定义终止条件</li>
+</ul>
+<p>效果还可以。</p>
+
+      
+    </div>
+    
+    
+    
+	
+	<div>
+		
+			<div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+		
+	</div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Algorithm/" <i class="fa fa-tag"></i> Algorithm</a>
+          
+            <a href="/tags/NLP/" <i class="fa fa-tag"></i> NLP</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/31/20180531TextRank提取关键词实现原理/" rel="next" title="TextRank提取关键词实现原理">
+                <i class="fa fa-chevron-left"></i> TextRank提取关键词实现原理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/18/20180618Self-discipline/" rel="prev" title="Self-Discipline">
+                Self-Discipline <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/author.jpg"
+                alt="余洋" />
+            
+              <p class="site-author-name" itemprop="name">余洋</p>
+              <p class="site-description motion-element" itemprop="description">Done is better than perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">56</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/Hunglish" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:yu.panda.yang@gmail.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/sexyBoy/" target="_blank" title="知乎">
+                    
+                      <i class="fa fa-fw fa-twitter"></i>知乎</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+
+
+
+
+
+
+
+
+
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#相似度计算"><span class="nav-number">1.</span> <span class="nav-text">相似度计算</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#相似度计算-1"><span class="nav-number">2.</span> <span class="nav-text">相似度计算</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#测试用例"><span class="nav-number">3.</span> <span class="nav-text">测试用例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#断句"><span class="nav-number">4.</span> <span class="nav-text">断句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分词并过滤停用词"><span class="nav-number">5.</span> <span class="nav-text">分词并过滤停用词</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#计算BM25相关矩阵"><span class="nav-number">6.</span> <span class="nav-text">计算BM25相关矩阵</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#迭代投票"><span class="nav-number">7.</span> <span class="nav-text">迭代投票</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#输出排序结果"><span class="nav-number">8.</span> <span class="nav-text">输出排序结果</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">余洋</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count"></span>
+  
+</div>
+
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2018/05/31/20180531TextRank摘要算法实现原理/';
+          this.page.identifier = '2018/05/31/20180531TextRank摘要算法实现原理/';
+          this.page.title = 'TextRank摘要算法实现原理';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("KNWjeXgELCzkAyNEk1ha6qat-gzGzoHsz", "DVvprAeUgywXSDutYxf0yQA8");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+  
+  <!-- 页面点击小红心 -->
+  <script type="text/javascript" src="/js/src/love.js"></script>
+</body>
+</html>
