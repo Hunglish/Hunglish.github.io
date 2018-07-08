@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>无所住而生其心</title>
+  
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yoursite.com/"/>
+  <updated>2018-07-08T03:11:58.609Z</updated>
+  <id>http://yoursite.com/</id>
+  
+  <author>
+    <name>余洋</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>热度TopN排名算法设计沉思录</title>
+    <link href="http://yoursite.com/2018/07/08/20180708%E7%83%AD%E5%BA%A6TopN%E6%8E%92%E5%90%8D%E7%AE%97%E6%B3%95%E8%AE%BE%E8%AE%A1%E6%B2%89%E6%80%9D%E5%BD%95/"/>
+    <id>http://yoursite.com/2018/07/08/20180708热度TopN排名算法设计沉思录/</id>
+    <published>2018-07-08T03:09:15.000Z</published>
+    <updated>2018-07-08T03:11:58.609Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+      <category term="Machine Learning" scheme="http://yoursite.com/categories/Machine-Learning/"/>
+    
+    
+      <category term="Algorithm" scheme="http://yoursite.com/tags/Algorithm/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>特征选择与稀疏学习</title>
+    <link href="http://yoursite.com/2018/06/25/20180625%E7%89%B9%E5%BE%81%E9%80%89%E6%8B%A9%E4%B8%8E%E7%A8%80%E7%96%8F%E5%AD%A6%E4%B9%A0/"/>
+    <id>http://yoursite.com/2018/06/25/20180625特征选择与稀疏学习/</id>
+    <published>2018-06-25T10:24:01.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script><h4 id="特征选择"><a href="#特征选择" class="headerlink" title="特征选择"></a>特征选择</h4><p>特征选择是我们进行机器学习训练前必须要考虑的一个步骤，周志华说特征选择是避免维度灾难和去重冗余特征，但是这两点都是为避免学习复杂度。但是也不能盲目去掉冗余特征，要根据结果考虑。如果计算体积的话，长宽底面积高，我们可以去掉长宽，保留底面积。</p><p>特征选择的过程本质上讲，离不开两个步骤：</p><ul><li>子集搜索</li><li>子集评价</li></ul><p>子集搜索一般都是贪心和穷举法，而子集评价的方法非常多，比较好用的一种就是计算信息增益。它定义为一个特征能够为分类系统带来多少信息，带来的信息越多，该特征越重要。对一个特征而言，系统有它和没它时信息量将发生变化，而前后信息量的差值就是这个特征给系统带来的信息量。所谓信息量，其实就是熵。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">信息量（熵）差值 —— 信息增益 —— 特征重要性</span><br></pre></td></tr></table></figure><font color="navy">其他特征选择方法本质上结合了某种或多种子集搜索和子集评价机制</font><p>而就方法论的角度来说，特征选择一共可以分为三大类：</p><ul><li>过滤</li><li>包裹</li><li>嵌入</li></ul><p>顾名思义也很好理解，过滤就是特征处理在机器学习之前，包裹是将机器学习模型本身的性能作为特征选择好坏的指标，换言之就是为某个模型量身定做的特征子集。</p><p>而嵌入式选择法就是将子集选择的过程与模型训练的过程结合在一起，譬如L1正则化。这里加入L1的损失函数的别名叫做LASSO回归，而加入L2的损失函数别名叫做岭回归。</p><p>关于L1, L2的讨论以及，何时取得最值的理解与证明，我觉得应该参考一下这个链接：<a href="https://www.zhihu.com/question/37096933" target="_blank" rel="noopener">L1为何比L2更易获得稀疏解</a>。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">而所有的稀疏表达的本质就是为了降维</span><br></pre></td></tr></table></figure><p>过滤法里，最有名的方法就是Relief方法，Relief是针对二分类设计的算法，大概原理，就是遍历样本集，对每一个样本，计算猜对临近nearly hit, 和猜错临近nearly miss，通过计算相关属性的统计量，来衡量该属性对区分同类异类样本是否有益。</p><p>包裹法比较具有代表性的法则是LVW，就是las vegas wrapper，没什么好说的，N次遍历，每次随机选择特征子集，到达程序停止条件后输出子集。停止条件老生常谈的两种，要么循环次数达到上限，要么CrossValidation误差小于阈值。</p><p>嵌入法，就是上文的LASSO回归和岭回归</p><h4 id="稀疏学习"><a href="#稀疏学习" class="headerlink" title="稀疏学习"></a>稀疏学习</h4><p>周志华老师关于稀疏学习讲了两个例子，一个是字典学习，一个是压缩感知，我觉得这是从两个不同方向来对稀疏学习进行阐述 。稀疏学习首先要求训练样本有许多无效特征，这样的话就可以用稀疏矩阵表达，<font color="navy"><strong>核心还是为了降低学习难度、减少储存开销、增强学习模型的可解释性</strong></font>。</p><p>首先字典学习，感觉也没什么特殊的LASSO回归配合交替优化变量发与奇异值分解对损失函数的最小值进行求解。这里你需要知道<font color="navy"><strong>这种问题的解决方式的思路</strong></font>是怎样的。</p><p>然后再是压缩感知，压缩感知解决问题的思路如同泰勒展开式的脑洞一样神奇。它与特征选择和稀疏表示不同，压缩感知关注的是如何利用自身信号的稀疏性，从部分观测样本中恢复原信号，分为感知测量，和感知重构这两个阶段。</p><p>这个算法有一个比较好的介绍，贴在这里：<a href="https://zhuanlan.zhihu.com/p/22445302" target="_blank" rel="noopener">压缩感知算法介绍</a></p><h5 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h5><p>所以稀疏学习代表了一类问题的解决方式，就是特征矩阵过于稀疏，或是期望将特征矩阵变成稀疏的时候。下面我再结合经验谈谈稀疏学习，稀疏学习是近几年比较火热的一门技术，在信号处理（主要是压缩感知）、计算机视觉（比如JPEG压缩）领域影响比较大，而在机器学习领域里面，稀疏学习可以看做是一种<font color="navy"><strong>特征处理</strong></font>相关的模型。</p><p>那么说人话，<font color="navy">稀疏表示</font>是在超完备字典D（超完备是说字典的行数小于列数）中用尽可能少的原子来表示信号x，即：</p><p> $$min||α||_0\ \ \ \ \ s.t. \ \ x = Dα.$$  </p><p>考虑噪声，就是</p><p>$$min||x - Dα||_2^2+||α||_0$$</p><p>α的size要比x大很多，但是α的非零元素要比x少很多，也就是说α是个外强中干（非常稀疏）的向量，所以稀疏表示的核心，就是用若干个（尽可能少）的向量，去表示原向量。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">稀疏即冗余</span><br></pre></td></tr></table></figure><p>当样本具有这样的稀疏表达形式的时候，对于学习任务有不少的好处，例如<font color="navy"><strong>支持向量机之所以能在文本数据上有很好的性能，恰好是由于文本数据使用了稀疏表示，使大多数问题变得线性可分</strong></font>。</p><p>而且稀疏表示在享受这么多好处的同时，并不会带来储存的负担。</p><p>稀疏模型研究方向主要包括系数求解（即上面那个问题，经典算法有OMP贪心、lasso凸松弛和L1/2非凸松弛），字典学习（获得更好的D，经典算法有MOD和K-SVD交替迭代）和模型应用。</p><p><font color="navy"><strong>显然稀疏表达的好坏与我们用的字典D有着密切的关系</strong></font>，字典分两类，一种是预先给定的分析字典，比如小波基、DCT等，另一种则是<font color="navy">针对特定数据集学习出特定的字典</font>。这种学出来的字典能大大提升在特定数据集的效果。</p><p>关于字典学习的模型，跟书里讲的差不多, 最小化系数表达与原表达的误差。</p><p>$$\max \limits_{D,W}||X-DW||_F^2\ \ \ \ s.t.||w_0|| \leq s$$</p><p>这个目标函数非凸，一般用交替迭代思想来解，即分别固定D和W，更新另一个。在Word2Vec的算法中，也体现了这种思想。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default&quot;&gt;&lt;/script&gt;
+
+&lt;h4 id=&quot;特征选择&quot;&gt;&lt;a href=&quot;#特征选择
+      
+    
+    </summary>
+    
+      <category term="Machine Learning" scheme="http://yoursite.com/categories/Machine-Learning/"/>
+    
+    
+      <category term="Algorithm" scheme="http://yoursite.com/tags/Algorithm/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>蒙特卡洛</title>
+    <link href="http://yoursite.com/2018/06/22/20180622%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B/"/>
+    <id>http://yoursite.com/2018/06/22/20180622蒙特卡洛/</id>
+    <published>2018-06-22T05:39:13.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>蒙特卡罗算法并不是一种算法的名称，而是对一类随机算法的特性的概括。媒体说“蒙特卡罗算法打败武宫正树”，这个说法就好比说“我被一只脊椎动物咬了”，是比较火星的。</p><p>那么“蒙特卡罗”是一种什么特性呢？</p><p>我们知道，既然是随机算法，在采样不全时，通常不能保证找到最优解，只能说是尽量找。那么根据怎么个“尽量”法儿，我们我们把随机算法分成两类：</p><ul><li>蒙特卡罗算法：采样越多，越近似最优解；</li><li>拉斯维加斯算法：采样越多，越有机会找到最优解；</li></ul><p>举个例子，假如筐里有100个苹果，让我每次闭眼拿1个，挑出最大的。于是我随机拿1个，再随机拿1个跟它比，留下大的，再随机拿1个……我每拿一次，留下的苹果都至少不比上次的小。拿的次数越多，挑出的苹果就越大，但我除非拿100次，否则无法肯定挑出了最大的。这个挑苹果的算法，就属于蒙特卡罗算法——尽量找好的，但不保证是最好的。而拉斯维加斯算法，则是另一种情况。假如有一把锁，给我100把钥匙，只有1把是对的。于是我每次随机拿1把钥匙去试，打不开就再换1把。我试的次数越多，打开（最优解）的机会就越大，但在打开之前，那些错的钥匙都是没有用的。这个试钥匙的算法，就是拉斯维加斯的——尽量找最好的，但不保证能找到。</p><p>所以蒙特卡洛本质上能够应对遍历无放回的最优值情况，而拉斯维加斯适合求解独立同分布的情况。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;蒙特卡罗算法并不是一种算法的名称，而是对一类随机算法的特性的概括。媒体说“蒙特卡罗算法打败武宫正树”，这个说法就好比说“我被一只脊椎动物咬了”，是比较火星的。&lt;/p&gt;
+&lt;p&gt;那么“蒙特卡罗”是一种什么特性呢？&lt;/p&gt;
+&lt;p&gt;我们知道，既然是随机算法，在采样不全时，通常不能保
+      
+    
+    </summary>
+    
+      <category term="Machine Learning" scheme="http://yoursite.com/categories/Machine-Learning/"/>
+    
+    
+      <category term="Algorithm" scheme="http://yoursite.com/tags/Algorithm/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>潜意识</title>
+    <link href="http://yoursite.com/2018/06/21/20180621%E6%BD%9C%E6%84%8F%E8%AF%86/"/>
+    <id>http://yoursite.com/2018/06/21/20180621潜意识/</id>
+    <published>2018-06-21T02:15:58.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>始终有两个我，在做斗争，可能是左右脑分工的区别。有一句话说的非常好：</p><font color="navy"><strong>除非你意识到你的潜意识，否则潜意识将主导你的人生，而你将其称为命运。</strong></font><p>我们的应激反应，陋习与缺点，都是我们感性大脑急于获得快感而发出的指令。包括高热量的食品，以及无节制的性爱，都算是人类对及时行乐的一个基因表达。<br>人的独特之处不仅仅在于他有语言和逻辑，而在于他能跳出来审视自己的思维的对错，如果我们时时刻刻能够提醒自己，不要让我们的潜意识主导我们的行为，那我们能够成长为一个非常值得尊敬的人。管理自己身材，头脑，情绪都算这个范围内。</p><p>当然我也清楚，永远做应该做的事情是非常勇敢的，可能要承担很多，但是No pains no gains，过去我的选择，或多或少都已经奖励或者惩罚我了。而在奔三的道路上，希望自己能够重拾当年的勇气，达到一个前所未有的高度，辨材须待七年期，君自珍重。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;始终有两个我，在做斗争，可能是左右脑分工的区别。有一句话说的非常好：&lt;/p&gt;
+&lt;font color=&quot;navy&quot;&gt;&lt;strong&gt;除非你意识到你的潜意识，否则潜意识将主导你的人生，而你将其称为命运。&lt;/strong&gt;&lt;/font&gt;
+
+
+
+&lt;p&gt;我们的应激反应，陋习与缺点，
+      
+    
+    </summary>
+    
+      <category term="Muse" scheme="http://yoursite.com/categories/Muse/"/>
+    
+    
+      <category term="Better Me" scheme="http://yoursite.com/tags/Better-Me/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Self-Discipline</title>
+    <link href="http://yoursite.com/2018/06/18/20180618Self-discipline/"/>
+    <id>http://yoursite.com/2018/06/18/20180618Self-discipline/</id>
+    <published>2018-06-18T11:18:19.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>张公子说：所有炫目的才华，都来自于过溢的基本功</p><p>于我心有戚戚焉，老话说台上一分钟，台下十年功，谈笑风生是需要肚子里有货的。而这十年功怎么积累，是个关键。<br>我们大部分人有自己的梦想，但是为自己的梦想做出牺牲的人太少太少。人类的进化决定了人总是倾向于让自己朝着舒适的方向去发展，而逃避那些让自己痛苦的事情，每个人最大的资本就是一天的24小时，如何去安排时间，如何自律，将在很大程度上决定你的个人高度。虽然以前我也明白这一点，但是长久以来人会麻木。就像我从《原则》感触到的，节省时间的一个好办法就是将自己要做的事情养成习惯，这就好比宏编程一样，可以很大程度上减少大脑的犹豫和纠结。</p><p>C罗就是一个极度自律的人，照理说功成名就后，可是在Ins上看到他po的状态，还是打心眼儿里佩服这样一个巨星。</p><font color="navy">C罗在曼联效力时，每天至少花一个小时锻炼腰腹和肌肉，自从转会皇马后，更加的疯狂，每天2000个仰卧起坐。这已成了C罗的人生日常，自律成了一种习惯。</font><p>越是站在世界之巅，越懂得自律的意义！</p><p><strong>Nothing worth comes easily</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;张公子说：所有炫目的才华，都来自于过溢的基本功&lt;/p&gt;
+&lt;p&gt;于我心有戚戚焉，老话说台上一分钟，台下十年功，谈笑风生是需要肚子里有货的。而这十年功怎么积累，是个关键。&lt;br&gt;我们大部分人有自己的梦想，但是为自己的梦想做出牺牲的人太少太少。人类的进化决定了人总是倾向于让自己朝
+      
+    
+    </summary>
+    
+    
+      <category term="Better Me" scheme="http://yoursite.com/tags/Better-Me/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>TextRank摘要算法实现原理</title>
+    <link href="http://yoursite.com/2018/05/31/20180531TextRank%E6%91%98%E8%A6%81%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/"/>
+    <id>http://yoursite.com/2018/05/31/20180531TextRank摘要算法实现原理/</id>
+    <published>2018-05-31T11:09:49.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>所谓自动摘要，就是从文章中自动抽取关键句。何谓关键句？人类的理解是能够概括文章中心的句子，机器的理解只能模拟人类的理解，即拟定一个权重的评分标准，给每个句子打分，之后给出排名靠前的几个句子。</p><h4 id="相似度计算"><a href="#相似度计算" class="headerlink" title="相似度计算"></a>相似度计算</h4><p>TextRank的打分思想依然是从PageRank的迭代思想衍生过来的，如下公式所示：</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180531TR-02.jpg" alt="创新扩散曲线"></p><p>等式左边表示一个句子的权重（WS是weight_sum的缩写），右侧的求和表示每个相邻句子对本句子的贡献程度。与提取关键字的时候不同，一般认为<font color="red"><strong>全部句子都是相邻的</strong></font>，不再提取窗口。</p><p>求和的分子wji表示两个句子的相似程度，分母又是一个weight_sum，而WS(Vj)代表上次迭代j的权重。整个公式是一个迭代的过程。</p><h4 id="相似度计算-1"><a href="#相似度计算-1" class="headerlink" title="相似度计算"></a>相似度计算</h4><p>而相似程度Wij的计算，推荐使用BM25</p><p>BM25算法，通常用来作搜索相关性评分。一句话概况其主要思想：对Query进行语素解析，生成语素qi；然后，对于每个搜索结果D，计算每个语素qi与D的相关性得分，最后，将qi相对于D的相关性得分进行加权求和，从而得到Query与D的相关性得分。</p><p><a href="https://www.jianshu.com/p/1e498888f505" target="_blank" rel="noopener">算法连接</a></p><h4 id="测试用例"><a href="#测试用例" class="headerlink" title="测试用例"></a>测试用例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">算法可大致分为基本算法、数据结构的算法、数论算法、计算几何的算法、图的算法、动态规划以及数值分析、加密算法、排序算法、检索算法、随机化算法、并行算法、厄米变形模型、随机森林算法。</span><br><span class="line"></span><br><span class="line">算法可以宽泛的分为三类，</span><br><span class="line"></span><br><span class="line">一，有限的确定性算法，这类算法在有限的一段时间内终止。他们可能要花很长时间来执行指定的任务，但仍将在一定的时间内终止。这类算法得出的结果常取决于输入值。</span><br><span class="line"></span><br><span class="line">二，有限的非确定算法，这类算法在有限的时间内终止。然而，对于一个（或一些）给定的数值，算法的结果并不是唯一的或确定的。</span><br><span class="line"></span><br><span class="line">三，无限的算法，是那些由于没有定义终止定义条件，或定义的条件无法由输入的数据满足而不终止运行的算法。通常，无限算法的产生是由于未能确定的定义终止条件。</span><br></pre></td></tr></table></figure><h4 id="断句"><a href="#断句" class="headerlink" title="断句"></a>断句</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">算法可大致分为基本算法、数据结构的算法、数论算法、计算几何的算法、图的算法、动态规划以及数值分析、加密算法、排序算法、检索算法、随机化算法、并行算法、厄米变形模型、随机森林算法</span><br><span class="line">算法可以宽泛的分为三类</span><br><span class="line">一</span><br><span class="line">有限的确定性算法</span><br><span class="line">这类算法在有限的一段时间内终止</span><br><span class="line">他们可能要花很长时间来执行指定的任务</span><br><span class="line">但仍将在一定的时间内终止</span><br><span class="line">这类算法得出的结果常取决于输入值</span><br><span class="line">二</span><br><span class="line">有限的非确定算法</span><br><span class="line">这类算法在有限的时间内终止</span><br><span class="line">然而</span><br><span class="line">对于一个（或一些）给定的数值</span><br><span class="line">算法的结果并不是唯一的或确定的</span><br><span class="line">三</span><br><span class="line">无限的算法</span><br><span class="line">是那些由于没有定义终止定义条件</span><br><span class="line">或定义的条件无法由输入的数据满足而不终止运行的算法</span><br><span class="line">通常</span><br><span class="line">无限算法的产生是由于未能确定的定义终止条件</span><br></pre></td></tr></table></figure><h4 id="分词并过滤停用词"><a href="#分词并过滤停用词" class="headerlink" title="分词并过滤停用词"></a>分词并过滤停用词</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[算法, 大致, 分, 基本, 算法, 数据, 结构, 算法, 数论, 算法, 计算, 几何, 算法, 图, 算法, 动态, 规划, 数值, 分析, 加密, 算法, 排序, 算法, 检索, 算法, 随机, 化, 算法, 并行, 算法, 厄, 米, 变形, 模型, 随机, 森林, 算法]</span><br><span class="line">[算法, 宽泛, 分为, 三类]</span><br><span class="line">[]</span><br><span class="line">[有限, 确定性, 算法]</span><br><span class="line">[类, 算法, 有限, 一段, 时间, 终止]</span><br><span class="line">[可能, 花, 长, 时间, 执行, 指定, 任务]</span><br><span class="line">[一定, 时间, 终止]</span><br><span class="line">[类, 算法, 得出, 常, 取决, 输入, 值]</span><br><span class="line">[二]</span><br><span class="line">[有限, 非, 确定, 算法]</span><br><span class="line">[类, 算法, 有限, 时间, 终止]</span><br><span class="line">[]</span><br><span class="line">[一个, 定, 数值]</span><br><span class="line">[算法, 唯一, 确定]</span><br><span class="line">[三]</span><br><span class="line">[无限, 算法]</span><br><span class="line">[没有, 定义, 终止, 定义, 条件]</span><br><span class="line">[定义, 条件, 无法, 输入, 数据, 满足, 终止, 运行, 算法]</span><br><span class="line">[通常]</span><br><span class="line">[无限, 算法, 产生, 未, 确定, 定义, 终止, 条件]</span><br></pre></td></tr></table></figure><h4 id="计算BM25相关矩阵"><a href="#计算BM25相关矩阵" class="headerlink" title="计算BM25相关矩阵"></a>计算BM25相关矩阵</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[15.176530737482341, -2.604484103028904, 0.0, -2.8740684265166565, -2.1930693258940175, 0.0, 0.0, -2.0325355810136103, 0.0, -2.604484103028904, -2.3811362523642052, 0.0, 2.509043358515279, -2.8740684265166565, 0.0, -3.2059044218809922, 0.0, -0.22517864251663589, 0.0, -1.8939010965185548]</span><br><span class="line">[-0.2864022115473306, 8.52437122545896, 0.0, -0.23950570220972142, -0.18275577715783484, 0.0, 0.0, -0.1693779650844675, 0.0, -0.21704034191907534, -0.19842802103035043, 0.0, 0.0, -0.23950570220972142, 0.0, -0.267158701823416, 0.0, -0.1477475757866994, 0.0, -0.15782509137654627]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, 4.604672851367114, 1.060086217315166, 0.0, 0.0, -0.1693779650844675, 0.0, 1.2589559610532894, 1.1509940396671094, 0.0, 0.0, -0.23950570220972142, 0.0, -0.267158701823416, 0.0, -0.1477475757866994, 0.0, -0.15782509137654627]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, 1.3892676764009562, 7.063472116341414, 1.1518653539666401, 2.634590118176154, 1.2574519044179069, 0.0, 1.2589559610532894, 5.005270773642655, 0.0, 0.0, -0.23950570220972142, 0.0, -0.267158701823416, 0.8333088661764476, 0.4727261064071153, 0.0, 0.504969645305668]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 1.2428419944730007, 14.795434933306574, 1.6287733786106775, 0.0, 0.0, 0.0, 1.3494220606974598, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 2.010334451736872, 1.1518653539666401, 5.849995293142312, 0.0, 0.0, 0.0, 2.1827309268739077, 0.0, 0.0, 0.0, 0.0, 0.0, 0.8333088661764476, 0.6204736821938147, 0.0, 0.6627947366822143]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, -0.23950570220972142, 1.356767982871274, 0.0, 0.0, 12.127555522767913, 0.0, -0.21704034191907534, 1.4731177860712878, 0.0, 0.0, -0.23950570220972142, 0.0, -0.267158701823416, 0.0, 1.4000446911370572, 0.0, -0.15782509137654627]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.054814792796337, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, 1.3892676764009562, 1.060086217315166, 0.0, 0.0, -0.1693779650844675, 0.0, 6.001094704342757, 1.1509940396671094, 0.0, 0.0, 1.7780760396570634, 0.0, -0.267158701823416, 0.0, -0.1477475757866994, 0.0, 1.1716840594784514]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, 1.3892676764009562, 4.609944429081147, 1.1518653539666401, 2.634590118176154, 1.2574519044179069, 0.0, 1.2589559610532894, 5.005270773642655, 0.0, 0.0, -0.23950570220972142, 0.0, -0.267158701823416, 0.8333088661764476, 0.4727261064071153, 0.0, 0.504969645305668]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span><br><span class="line">[0.5551884973225691, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 8.939853708447595, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, -0.23950570220972142, -0.18275577715783484, 0.0, 0.0, -0.1693779650844675, 0.0, 1.611294545577714, -0.19842802103035043, 0.0, 0.0, 4.9934812146232215, 0.0, -0.267158701823416, 0.0, -0.1477475757866994, 0.0, 1.1716840594784514]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.054814792796337, 0.0, 0.0, 0.0, 0.0, 0.0]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, -0.23950570220972142, -0.18275577715783484, 0.0, 0.0, -0.1693779650844675, 0.0, -0.21704034191907534, -0.19842802103035043, 0.0, 0.0, -0.23950570220972142, 0.0, 2.531575358765468, 0.0, -0.1477475757866994, 0.0, 1.4955384555950606]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 0.7674924572638717, 0.0, 1.0058167395654765, 0.0, 0.0, 0.0, 0.8333088661764476, 0.0, 0.0, 0.0, 0.0, 0.0, 9.892547495751218, 4.354323965031352, 0.0, 4.651322189247207]</span><br><span class="line">[0.26878628577523855, -0.21704034191907534, 0.0, -0.23950570220972142, 0.5847366801060369, 0.0, 1.0058167395654765, 1.6050126003722507, 0.0, -0.21704034191907534, 0.6348808451460972, 0.0, 0.0, -0.23950570220972142, 0.0, -0.267158701823416, 4.866735958438866, 12.008153881124132, 0.0, 3.1639879470156633]</span><br><span class="line">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.054814792796337, 0.0]</span><br><span class="line">[-0.2864022115473306, -0.21704034191907534, 0.0, -0.23950570220972142, 0.5847366801060369, 0.0, 1.0058167395654765, -0.1693779650844675, 0.0, 1.611294545577714, 0.6348808451460972, 0.0, 0.0, 1.7780760396570634, 0.0, 2.531575358765468, 4.866735958438866, 2.9619596282988065, 0.0, 10.38451854500608]</span><br></pre></td></tr></table></figure><h4 id="迭代投票"><a href="#迭代投票" class="headerlink" title="迭代投票"></a>迭代投票</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">for (int _ = 0; _ &lt; max_iter; ++_)</span><br><span class="line">&#123;</span><br><span class="line">    double[] m = new double[D];</span><br><span class="line">    double max_diff = 0;</span><br><span class="line">    for (int i = 0; i &lt; D; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        m[i] = 1 - d;</span><br><span class="line">        for (int j = 0; j &lt; D; ++j)</span><br><span class="line">        &#123;</span><br><span class="line">            if (j == i || weight_sum[j] == 0) continue;</span><br><span class="line">            m[i] += (d * weight[j][i] / weight_sum[j] * vertex[j]);</span><br><span class="line">        &#125;</span><br><span class="line">        double diff = Math.abs(m[i] - vertex[i]);</span><br><span class="line">        if (diff &gt; max_diff)</span><br><span class="line">        &#123;</span><br><span class="line">            max_diff = diff;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    vertex = m;</span><br><span class="line">    if (max_diff &lt;= min_diff) break;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h4 id="输出排序结果"><a href="#输出排序结果" class="headerlink" title="输出排序结果"></a>输出排序结果</h4><ul><li>这类算法在有限的时间内终止</li><li>这类算法在有限的一段时间内终止</li><li>无限算法的产生是由于未能确定的定义终止条件</li></ul><p>效果还可以。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;所谓自动摘要，就是从文章中自动抽取关键句。何谓关键句？人类的理解是能够概括文章中心的句子，机器的理解只能模拟人类的理解，即拟定一个权重的评分标准，给每个句子打分，之后给出排名靠前的几个句子。&lt;/p&gt;
+&lt;h4 id=&quot;相似度计算&quot;&gt;&lt;a href=&quot;#相似度计算&quot; class
+      
+    
+    </summary>
+    
+      <category term="Machine Learning" scheme="http://yoursite.com/categories/Machine-Learning/"/>
+    
+    
+      <category term="Algorithm" scheme="http://yoursite.com/tags/Algorithm/"/>
+    
+      <category term="NLP" scheme="http://yoursite.com/tags/NLP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>TextRank提取关键词实现原理</title>
+    <link href="http://yoursite.com/2018/05/31/20180531TextRank%E6%8F%90%E5%8F%96%E5%85%B3%E9%94%AE%E8%AF%8D%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/"/>
+    <id>http://yoursite.com/2018/05/31/20180531TextRank提取关键词实现原理/</id>
+    <published>2018-05-31T06:51:12.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>TextRank是在Google的PageRank算法启发下，针对文本里的句子设计的权重算法，目标是自动摘要。它利用投票的原理，让每一个单词给它的邻居（术语称窗口）投赞成票，票的权重取决于自己的票数。这是一个“先有鸡还是先有蛋”的悖论，PageRank采用矩阵迭代收敛的方式解决了这个悖论。TextRank也不例外：</p><h4 id="PageRank的计算公式："><a href="#PageRank的计算公式：" class="headerlink" title="PageRank的计算公式："></a>PageRank的计算公式：</h4><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180531TR-01.jpg" alt="创新扩散曲线"></p><h4 id="TextRank的计算公式："><a href="#TextRank的计算公式：" class="headerlink" title="TextRank的计算公式："></a>TextRank的计算公式：</h4><p>正规的TextRank公式在PageRank的公式的基础上，引入了边的权值的概念，<font color="red"><strong>代表两个句子的相似度</strong></font>。<br><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180531TR-02.jpg" alt="创新扩散曲线"></p><p>但是很明显我只想计算关键字，如果把一个单词视为一个句子的话，那么所有句子（单词）构成的边的权重都是0（没有交集，没有相似性），所以分子分母的权值w约掉了，算法退化为PageRank。所以说，这里称关键字提取算法为PageRank也不为过。</p><h4 id="Java实现"><a href="#Java实现" class="headerlink" title="Java实现"></a>Java实现</h4><p>先看看测试数据</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">程序员(英文Programmer)是从事程序开发、维护的专业人员。</span><br><span class="line">一般将程序员分为程序设计人员和程序编码人员，但两者的</span><br><span class="line">界限并不非常清楚，特别是在中国。软件从业人员分为初级</span><br><span class="line">程序员、高级程序员、系统分析员和项目经理四大类。</span><br></pre></td></tr></table></figure><p>我取出了百度百科关于“程序员”的定义作为测试用例，很明显，这段定义的关键字应当是“程序员”并且“程序员”的得分应当最高。</p><p>首先对这句话分词，这里可以借助各种分词项目，比如HanLP分词，得出分词结果：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[程序员/n, (, 英文/nz, programmer/en, ), 是/v, 从事/v, 程序/n, </span><br><span class="line">开发/v, 、/w, 维护/v, 的/uj, 专业/n, 人员/n, 。/w, 一般/a, </span><br><span class="line">将/d, 程序员/n, 分为/v, 程序/n, 设计/vn, 人员/n, 和/c, </span><br><span class="line">程序/n, 编码/n, 人员/n, ，/w, 但/c, 两者/r, 的/uj, 界限/n, </span><br><span class="line">并/c, 不/d, 非常/d, 清楚/a, ，/w, 特别/d, 是/v, 在/p, 中国/ns, 。</span><br><span class="line">/w, 软件/n, 从业/b, 人员/n, 分为/v, 初级/b, 程序员/n, 、</span><br><span class="line">/w, 高级/a, 程序员/n, 、/w, 系统/n, 分析员/n, 和/c, 项目/n,</span><br><span class="line"> 经理/n, 四/m, 大/a, 类/q, 。/w]</span><br></pre></td></tr></table></figure><p>然后去掉里面的停用词，这里我去掉了标点符号、常用词、以及“名词、动词、形容词、副词之外的词”。得出实际有用的词语：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[程序员, 英文, 程序, 开发, 维护, 专业, 人员, 程序员, </span><br><span class="line">分为, 程序, 设计, 人员, 程序, 编码, 人员, 界限, 特别, </span><br><span class="line">中国, 软件, 人员, 分为, 程序员, 高级, 程序员, 系统, </span><br><span class="line">分析员, 项目, 经理]</span><br></pre></td></tr></table></figure><p>下面是代码实现的关键：</p><font color="navy">之后建立两个大小为5的窗口，每个单词将票投给它身前身后距离5以内的单词（中括号的词排名不分先后，但原始分词顺序不可以打乱）：</font><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&#123;开发=[专业, 程序员, 维护, 英文, 程序, 人员],</span><br><span class="line"></span><br><span class="line"> 软件=[程序员, 分为, 界限, 高级, 中国, 特别, 人员],</span><br><span class="line"></span><br><span class="line"> 程序员=[开发, 软件, 分析员, 维护, 系统, 项目, 经理, 分为, 英文, 程序, 专业, 设计, 高级, 人员, 中国],</span><br><span class="line"></span><br><span class="line"> 分析员=[程序员, 系统, 项目, 经理, 高级],</span><br><span class="line"></span><br><span class="line"> 维护=[专业, 开发, 程序员, 分为, 英文, 程序, 人员],</span><br><span class="line"></span><br><span class="line"> 系统=[程序员, 分析员, 项目, 经理, 分为, 高级],</span><br><span class="line"></span><br><span class="line"> 项目=[程序员, 分析员, 系统, 经理, 高级],</span><br><span class="line"></span><br><span class="line"> 经理=[程序员, 分析员, 系统, 项目],</span><br><span class="line"></span><br><span class="line"> 分为=[专业, 软件, 设计, 程序员, 维护, 系统, 高级, 程序, 中国, 特别, 人员],</span><br><span class="line"></span><br><span class="line"> 英文=[专业, 开发, 程序员, 维护, 程序],</span><br><span class="line"></span><br><span class="line"> 程序=[专业, 开发, 设计, 程序员, 编码, 维护, 界限, 分为, 英文, 特别, 人员],</span><br><span class="line"></span><br><span class="line"> 特别=[软件, 编码, 分为, 界限, 程序, 中国, 人员],</span><br><span class="line"></span><br><span class="line"> 专业=[开发, 程序员, 维护, 分为, 英文, 程序, 人员],</span><br><span class="line"></span><br><span class="line"> 设计=[程序员, 编码, 分为, 程序, 人员],</span><br><span class="line"></span><br><span class="line"> 编码=[设计, 界限, 程序, 中国, 特别, 人员],</span><br><span class="line"></span><br><span class="line"> 界限=[软件, 编码, 程序, 中国, 特别, 人员],</span><br><span class="line"></span><br><span class="line"> 高级=[程序员, 软件, 分析员, 系统, 项目, 分为, 人员],</span><br><span class="line"></span><br><span class="line"> 中国=[程序员, 软件, 编码, 分为, 界限, 特别, 人员],</span><br><span class="line"></span><br><span class="line"> 人员=[开发, 程序员, 软件, 维护, 分为, 程序, 特别, 专业, 设计, 编码, 界限, 高级, 中国]&#125;</span><br></pre></td></tr></table></figure><p>然后开始迭代投票，代码没什么难的，就是按照原论文算法过程简单的实现了一遍，这里简单给个注释，省得以后看起来麻烦：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">for (int i = 0; i &lt; max_iter; ++i) //最外层条件是算法设定的最大迭代次数</span><br><span class="line">       &#123;</span><br><span class="line">           Map&lt;String, Float&gt; m = new HashMap&lt;String, Float&gt;(); //&lt;单词，分数&gt;</span><br><span class="line">           float max_diff = 0; //算法终止收敛值</span><br><span class="line">           //一个entry代表一个窗口列表，例如： 设计=[程序员, 编码, 分为, 程序, 人员]</span><br><span class="line">           //按照这个entry来举例解释下面的代码</span><br><span class="line">           for (Map.Entry&lt;String, Set&lt;String&gt;&gt; entry : words.entrySet()) </span><br><span class="line">           &#123;</span><br><span class="line">               String key = entry.getKey();  //设计</span><br><span class="line">               Set&lt;String&gt; value = entry.getValue();  //[程序员, 编码, 分为, 程序, 人员]</span><br><span class="line">               m.put(key, 1 - d);  //公式里面的（1-d）</span><br><span class="line">               for (String other : value) //对value列表中的单词进行遍历</span><br><span class="line">               &#123;</span><br><span class="line">                   int size = words.get(other).size(); //单词的度</span><br><span class="line">                   if (key.equals(other) || size == 0) continue; //保证列表单词与待求单词不同</span><br><span class="line">                   m.put(key, m.get(key) + d / size * (score.get(other) == null ? 0 : score.get(other)));</span><br><span class="line">               &#125;</span><br><span class="line">               //每次计算分数后要计算误差与收敛值的差值</span><br><span class="line">               max_diff = Math.max(max_diff, Math.abs(m.get(key) - (score.get(key) == null ? 0 : score.get(key))));</span><br><span class="line">           &#125;</span><br><span class="line">           score = m;</span><br><span class="line">           if (max_diff &lt;= min_diff) break;</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure><p>排序后的投票结果：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">[程序员=1.9249977,</span><br><span class="line"></span><br><span class="line">人员=1.6290349,</span><br><span class="line"></span><br><span class="line">分为=1.4027836,</span><br><span class="line"></span><br><span class="line">程序=1.4025855,</span><br><span class="line"></span><br><span class="line">高级=0.9747374,</span><br><span class="line"></span><br><span class="line">软件=0.93525416,</span><br><span class="line"></span><br><span class="line">中国=0.93414587,</span><br><span class="line"></span><br><span class="line">特别=0.93352026,</span><br><span class="line"></span><br><span class="line">维护=0.9321688,</span><br><span class="line"></span><br><span class="line">专业=0.9321688,</span><br><span class="line"></span><br><span class="line">系统=0.885048,</span><br><span class="line"></span><br><span class="line">编码=0.82671607,</span><br><span class="line"></span><br><span class="line">界限=0.82206935,</span><br><span class="line"></span><br><span class="line">开发=0.82074183,</span><br><span class="line"></span><br><span class="line">分析员=0.77101076,</span><br><span class="line"></span><br><span class="line">项目=0.77101076,</span><br><span class="line"></span><br><span class="line">英文=0.7098714,</span><br><span class="line"></span><br><span class="line">设计=0.6992446,</span><br><span class="line"></span><br><span class="line">经理=0.64640945]</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;TextRank是在Google的PageRank算法启发下，针对文本里的句子设计的权重算法，目标是自动摘要。它利用投票的原理，让每一个单词给它的邻居（术语称窗口）投赞成票，票的权重取决于自己的票数。这是一个“先有鸡还是先有蛋”的悖论，PageRank采用矩阵迭代收敛的方式
+      
+    
+    </summary>
+    
+      <category term="Machine Learning" scheme="http://yoursite.com/categories/Machine-Learning/"/>
+    
+    
+      <category term="Algorithm" scheme="http://yoursite.com/tags/Algorithm/"/>
+    
+      <category term="NLP" scheme="http://yoursite.com/tags/NLP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Word2Vector原始版本过程深度解析</title>
+    <link href="http://yoursite.com/2018/05/29/20180529Word2Vector%E8%BF%87%E7%A8%8B%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"/>
+    <id>http://yoursite.com/2018/05/29/20180529Word2Vector过程深度解析/</id>
+    <published>2018-05-29T08:50:30.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>此文主要讲述未用哈夫曼二叉树优化的w2v计算过程，可以对其神经网络对自然语言处理的过程有个基本的认识。</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180529-W2V-01.jpg" alt="创新扩散曲线"></p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180529-W2V-02.jpg" alt="创新扩散曲线"></p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180529-W2V-03.jpg" alt="创新扩散曲线"></p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180529-W2V-04.jpg" alt="创新扩散曲线"></p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180529-W2V-05.jpg" alt="创新扩散曲线"></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;此文主要讲述未用哈夫曼二叉树优化的w2v计算过程，可以对其神经网络对自然语言处理的过程有个基本的认识。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/pictur
+      
+    
+    </summary>
+    
+      <category term="Machine Learning" scheme="http://yoursite.com/categories/Machine-Learning/"/>
+    
+    
+      <category term="Algorithm" scheme="http://yoursite.com/tags/Algorithm/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>NLP之中文分词实现原理</title>
+    <link href="http://yoursite.com/2018/05/28/20180528NLP%E4%B9%8B%E4%B8%AD%E6%96%87%E5%88%86%E8%AF%8D%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/"/>
+    <id>http://yoursite.com/2018/05/28/20180528NLP之中文分词实现原理/</id>
+    <published>2018-05-28T07:04:06.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>目前中文分词三大主流分词方法：基于词典的方法、基于规则的方法和基于统计的方法</p><h3 id="基于词典的方法"><a href="#基于词典的方法" class="headerlink" title="基于词典的方法"></a>基于词典的方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">定义：按照一定策略将待分析的汉字串与一个“大机器词典”中的词条进行匹配，若在词典中找到某个字符串，则匹配成功。</span><br></pre></td></tr></table></figure><ul><li>按照扫描方向的不同：正向匹配和逆向匹配</li><li>按照长度的不同：最大匹配和最小匹配</li></ul><h4 id="正向最大匹配思想MM"><a href="#正向最大匹配思想MM" class="headerlink" title="正向最大匹配思想MM"></a>正向最大匹配思想MM</h4><ul><li>从左向右取待切分汉语句的m个字符作为匹配字段，m为大机器词典中最长词条个数。</li><li>查找大机器词典并进行匹配： <ul><li>若匹配成功，则将这个匹配字段作为一个词切分出来。</li><li>若匹配不成功，则将这个匹配字段的最后一个字去掉，剩下的字符串作为新的匹配字段，进行再次匹配，重复以上过程，直到切分出所有词为止。</li></ul></li></ul><p>举个栗子： </p><p>现在，我们要对“南京市长江大桥”这个句子进行分词，根据正向最大匹配的原则：</p><ul><li>先从句子中拿出前5个字符“南京市长江”，把这5个字符到词典中匹配，发现没有这个词，那就缩短取字个数，取前四个“南京市长”，发现词库有这个词，就把该词切下来；</li><li>对剩余三个字“江大桥”再次进行正向最大匹配，会切成“江”、“大桥”；</li><li>整个句子切分完成为：南京市长、江、大桥；</li></ul><h4 id="逆向最大匹配算法RMM"><a href="#逆向最大匹配算法RMM" class="headerlink" title="逆向最大匹配算法RMM"></a>逆向最大匹配算法RMM</h4><p>该算法是正向最大匹配的逆向思维，匹配不成功，将匹配字段的最前一个字去掉，实验表明，逆向最大匹配算法要优于正向最大匹配算法。</p><p>还是那个栗子：</p><ul><li>取出“南京市长江大桥”的后四个字“长江大桥”，发现词典中有匹配，切割下来；</li><li>对剩余的“南京市”进行分词，整体结果为：南京市、长江大桥</li></ul><h4 id="双向最大匹配法-Bi-directction-Matching-method-BM"><a href="#双向最大匹配法-Bi-directction-Matching-method-BM" class="headerlink" title="双向最大匹配法(Bi-directction Matching method,BM)"></a>双向最大匹配法(Bi-directction Matching method,BM)</h4><p>双向最大匹配法是将正向最大匹配法得到的分词结果和逆向最大匹配法的到的结果进行比较，从而决定正确的分词方法。</p><p>据SunM.S. 和 Benjamin K.T.（1995）的研究表明，中文中90.0％左右的句子，正向最大匹配法和逆向最大匹配法完全重合且正确，只有大概9.0％的句子两种切分方法得到的结果不一样，但其中必有一个是正确的（歧义检测成功），只有不到1.0％的句子，或者正向最大匹配法和逆向最大匹配法的切分虽重合却是错的，或者正向最大匹配法和逆向最大匹配法切分不同但两个都不对（歧义检测失败）。这正是双向最大匹配法在实用中文信息处理系统中得以广泛使用的原因所在。</p><p>还是那个栗子： </p><p>双向的最大匹配，即把所有可能的最大词都分出来，上面的句子可以分为：南京市、南京市长、长江大桥、江、大桥</p><h4 id="设立切分标志法"><a href="#设立切分标志法" class="headerlink" title="设立切分标志法"></a>设立切分标志法</h4><p>收集切分标志，在自动分词前处理切分标志，再用MM、RMM进行细加工。</p><h4 id="最佳匹配（OM，分正向和逆向）"><a href="#最佳匹配（OM，分正向和逆向）" class="headerlink" title="最佳匹配（OM，分正向和逆向）"></a>最佳匹配（OM，分正向和逆向）</h4><p>对分词词典按词频大小顺序排列，并注明长度，降低时间复杂度。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">优点：易于实现 </span><br><span class="line">缺点：匹配速度慢。对于未登录词的补充较难实现。缺乏自学习。</span><br></pre></td></tr></table></figure><h4 id="逐词遍历法"><a href="#逐词遍历法" class="headerlink" title="逐词遍历法"></a>逐词遍历法</h4><p>这种方法是将词库中的词由长到短递减的顺序，逐个在待处理的材料中搜索，直到切分出所有的词为止。 </p><p>处理以上基本的机械分词方法外，还有双向扫描法、二次扫描法、基于词频统计的分词方法、联想—回溯法等。</p><h3 id="基于统计的分词"><a href="#基于统计的分词" class="headerlink" title="基于统计的分词"></a>基于统计的分词</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">随着大规模语料库的建立，统计机器学习方法的研究和发展，基于统计的中文分词方法渐渐成为了主流方法。</span><br></pre></td></tr></table></figure><p><strong>主要思想</strong>：把每个词看做是由词的最小单位各个字总成的，如果相连的字在不同的文本中出现的次数越多，就证明这相连的字很可能就是一个词。因此我们就可以利用字与字相邻出现的频率来反应成词的可靠度，统计语料中相邻共现的各个字的组合的频度，当组合频度高于某一个临界值时，我们便可认为此字组可能会构成一个词语。</p><p><strong>主要统计模型</strong>：N元文法模型（N-gram），隐马尔可夫模型（Hidden Markov Model ，HMM），最大熵模型（ME），条件随机场模型（Conditional Random Fields，CRF）等。</p><p><strong>优势</strong>：在实际的应用中经常是将分词词典串匹配分词和统计分词能较好地识别新词两者结合起来使用，这样既体现了匹配分词切分不仅速度快，而且效率高的特点；同时又能充分地利用统计分词在结合上下文识别生词、自动消除歧义方面的优点。</p><h4 id="N-gram模型思想"><a href="#N-gram模型思想" class="headerlink" title="N-gram模型思想"></a>N-gram模型思想</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">模型基于这样一种假设，第n个词的出现只与前面N-1个词相关，而与其它任何词都不相关，整句的概率就是各个词出现概率的乘积。</span><br></pre></td></tr></table></figure><p>我们给定一个词，然后猜测下一个词是什么。当我说“艳照门”这个词时，你想到下一个词是什么呢？我想大家很有可能会想到“陈冠希”，基本上不会有人会想到“陈志杰”吧，N-gram模型的主要思想就是这样的。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">对于一个句子T，我们怎么算它出现的概率呢？假设T是由词序列W1,W2,W3,…Wn组成的，那么P(T)=P(W1W2W3…Wn)=P(W1)P(W2|W1)P(W3|W1W2)…P(Wn|W1W2…Wn-1) </span><br><span class="line"></span><br><span class="line">但是这种方法存在两个致命的缺陷：一个缺陷是参数空间过大，不可能实用化；另外一个缺陷是数据稀疏严重。为了解决这个问题，我们引入了马尔科夫假设：一个词的出现仅仅依赖于它前面出现的有限的一个或者几个词。如果一个词的出现仅依赖于它前面出现的一个词，那么我们就称之为bigram。即</span><br><span class="line"></span><br><span class="line">P(T) =P(W1W2W3…Wn)=P(W1)P(W2|W1)P(W3|W1W2)…P(Wn|W1W2…Wn-1) </span><br><span class="line">≈P(W1)P(W2|W1)P(W3|W2)…P(Wn|Wn-1)</span><br></pre></td></tr></table></figure><p>如果一个词的出现仅依赖于它前面出现的两个词，那么我们就称之为trigram。</p><p>在实践中用的最多的就是bigram和trigram了，而且效果很不错。高于四元的用的很少，因为训练它需要更庞大的语料，而且数据稀疏严重，时间复杂度高，精度却提高的不多。一般的小公司，用到二元的模型就够了，像Google这种巨头，也只是用到了大约四元的程度，它对计算能力和空间的需求都太大了。</p><p>以此类推，N元模型就是假设当前词的出现概率只同它前面的N-1个词有关。</p><h4 id="HMM、CRF-模型思想"><a href="#HMM、CRF-模型思想" class="headerlink" title="HMM、CRF 模型思想"></a>HMM、CRF 模型思想</h4><p>以往的分词方法，无论是基于规则的还是基于统计的，一般都依赖于一个事先编制的词表(词典)，自动分词过程就是通过词表和相关信息来做出词语切分的决策。与此相反，</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">基于字标注（或者叫基于序列标注）的分词方法实际上是构词方法，即把分词过程视为字在字串中的标注问题。</span><br></pre></td></tr></table></figure><p>由于每个字在构造一个特定的词语时都占据着一个确定的构词位置(即词位)，假如规定每个字最多只有四个构词位置：即B(词首)，M (词中)，E(词尾)和S(单独成词)，那么下面句子(甲)的分词结果就可以直接表示成如(乙)所示的逐字标注形式：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(甲)分词结果：／上海／计划／N／本／世纪／末／实现／人均／国内／生产／总值／五千美元／ </span><br><span class="line">(乙)字标注形式：上／B海／E计／B划／E N／S 本／s世／B 纪／E 末／S 实／B 现／E 人／B 均／E 国／B 内／E生／B产／E总／B值／E 五／B千／M 美／M 元／E 。／S</span><br></pre></td></tr></table></figure><p>首先需要说明，这里说到的“字”不只限于汉字。考虑到中文真实文本中不可避免地会包含一定数量的非汉字字符，本文所说的“字”，也包括外文字母、阿拉伯数字和标点符号等字符。所有这些字符都是构词的基本单元。当然，汉字依然是这个单元集合中数量最多的一类字符。</p><p>把分词过程视为字的标注问题的一个重要优势在于，它能够平衡地看待词表词和未登录词的识别问题。</p><p>在这种分词技术中，文本中的词表词和未登录词都是用统一的字标注过程来实现的。在学习架构上，既可以不必专门强调词表词信息，也不用专门设计特定的未登录词(如人名、地名、机构名)识别模块。这使得分词系统的设计大大简化。在字标注过程中，所有的字根据预定义的特征进行词位特性的学习，获得一个概率模型。然后，在待分字串上，根据字与字之间的结合紧密程度，得到一个词位的标注结果。最后，根据词位定义直接获得最终的分词结果。总而言之，在这样一个分词过程中，分词成为字重组的简单过程。在学习构架上，由于可以不必特意强调词表词的信息，也不必专门设计针对未登录词的特定模块，这样使分词系统的设计变得尤为简单。</p><p>2001年Lafferty在最大熵模型（MEM）和隐马尔科夫模型（HMM）的基础上提出来了一种无向图模型–条件随机场（CRF）模型，它能在给定需要标记的观察序列的条件下，最大程度提高标记序列的联合概率。常用于切分和标注序列化数据的统计模型。</p><h3 id="基于统计分词方法的实现"><a href="#基于统计分词方法的实现" class="headerlink" title="基于统计分词方法的实现"></a>基于统计分词方法的实现</h3><p>现在，我们已经从全概率公式引入了语言模型，那么真正用起来如何用呢？ </p><p>我们有了统计语言模型，下一步要做的就是划分句子求出概率最高的分词，也就是对句子进行划分，最原始直接的方式，就是对句子的所有可能的分词方式进行遍历然后求出概率最高的分词组合。但是这种穷举法显而易见非常耗费性能，所以我们要想办法用别的方式达到目的。</p><p>仔细思考一下，假如我们把每一个字当做一个节点，每两个字之间的连线看做边的话，对于句子“中国人民银行”，我们可以构造一个如下的分词结构：</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180528NLP-01.jpg" alt="高山仰止"></p><p>我们要找概率最大的分词结构的话，可以看做是一个动态规划问题， 也就是说，要找整个句子的最大概率结构，对于其子串也应该是最大概率的。</p><p>对于句子任意一个位置t上的字，我们要从词典中找到其所有可能的词组形式，如上图中的第一个字，可能有：中、中国、中国人三种组合，第四个字可能只有民，经过整理，我们的分词结构可以转换成以下的有向图模型: </p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180528NLP-02.jpg" alt="高山仰止"></p><p>我们要做的就是找到一个概率最大的路径即可。我们假设Ct(k)表示第t个字的位置可能的词是k，那么可以写出状态转移方程： </p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180528NLP-03.jpg" alt="高山仰止"></p><p>其中k是当前位置的可能单词，l是上一个位置的可能单词，M是l可能的取值，有了状态转移返程，写出递归的动态规划代码就很容易了（这个方程其实就是著名的viterbi算法，通常在隐马尔科夫模型中应用较多）。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;目前中文分词三大主流分词方法：基于词典的方法、基于规则的方法和基于统计的方法&lt;/p&gt;
+&lt;h3 id=&quot;基于词典的方法&quot;&gt;&lt;a href=&quot;#基于词典的方法&quot; class=&quot;headerlink&quot; title=&quot;基于词典的方法&quot;&gt;&lt;/a&gt;基于词典的方法&lt;/h3&gt;&lt;figure
+      
+    
+    </summary>
+    
+      <category term="Machine Learning" scheme="http://yoursite.com/categories/Machine-Learning/"/>
+    
+    
+      <category term="NLP" scheme="http://yoursite.com/tags/NLP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spark PipeLine</title>
+    <link href="http://yoursite.com/2018/04/06/20180406Spark-PipeLine/"/>
+    <id>http://yoursite.com/2018/04/06/20180406Spark-PipeLine/</id>
+    <published>2018-04-06T07:08:45.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>以前spark-streaming用的比较多，ML库用的比较少，对pipeline之类的概念理解的不够深入。趁清明假期总结一下，温故知新。</p><p>spark提供的标准的机器学习算法能够将不同的算法和组件组合在一起，形成一个管道或者工作流。可以参考代码来看：<br><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180406PIPELINE01.jpg" alt="高山仰止"></p><p>可以看到pipeline可以顾名思义地理解为管道，将所有的算法和配置组建起来。MLlib对机器学习算法的API进行了标准化，使得将多种算法合并成一个pipeline或工作流变得更加容易。Pipeline的概念主要是受scikit-learn启发。接下来解释一下各个细节：</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;以前spark-streaming用的比较多，ML库用的比较少，对pipeline之类的概念理解的不够深入。趁清明假期总结一下，温故知新。&lt;/p&gt;
+&lt;p&gt;spark提供的标准的机器学习算法能够将不同的算法和组件组合在一起，形成一个管道或者工作流。可以参考代码来看：&lt;br&gt;&lt;
+      
+    
+    </summary>
+    
+      <category term="Coding" scheme="http://yoursite.com/categories/Coding/"/>
+    
+    
+      <category term="Spark" scheme="http://yoursite.com/tags/Spark/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>word2vec学习问题简记</title>
+    <link href="http://yoursite.com/2018/03/21/20180321word2vec%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <id>http://yoursite.com/2018/03/21/20180321word2vec学习笔记/</id>
+    <published>2018-03-21T10:24:15.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>为了表示对前辈的尊敬，  <strong><a href="https://www.zybuluo.com/Dounm/note/591752" target="_blank" rel="noopener">这篇文章</a></strong>建议所有做word2vector的人都应该拜读</p><p>关于模型的解释，很简单：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">词 =&gt; 上下文  Skip-gram</span><br><span class="line">上下文 =&gt; 词  CBOW Continuous Bag-of-words Model</span><br></pre></td></tr></table></figure><p>损失函数是L =Σ𝑙𝑜𝑔𝑝(𝑤|𝐶𝑜𝑛𝑡𝑒𝑥𝑡(𝑤)),   w𝜖𝐶， 所以word2vec的关键问题：如何构造概率函数𝑝(𝑤|𝐶𝑜𝑛𝑡𝑒𝑥𝑡(𝑤))。实际上word2vector的损失函数用的是交叉熵。交叉熵是什么意思？这个要回归到香农熵定义当中去。</p><p>现有关于样本集的2个概率分布p和q，其中p为真实分布，q非真实分布。按照真实分布p来衡量识别一个样本的所需要的编码长度的期望(即平均编码长度)为：H(p) = Σp(i) <em> log(1/p(i))。如果使用错误分布q来表示来自真实分布p的平均编码长度，则应该是：H(p,q) = Σp(i) </em> log(1/q(i))。因为用q来编码的样本来自分布p，所以期望H(p,q)中概率是p(i)。H(p,q)我们称之为“交叉熵”。</p><p>也就是说，交叉熵越来越小的时候，错误分布就约逼近正确分布。</p><h3 id="基于-Hierarchical-Softmax-的模型"><a href="#基于-Hierarchical-Softmax-的模型" class="headerlink" title="基于 Hierarchical Softmax 的模型"></a>基于 Hierarchical Softmax 的模型</h3><p>也就是分层softmax，它的提出是为了应对传统的神经网络语言模型最后输出层的计算复杂度的问题，由于传统的softmax分母在每一次训练完一个单词后，需要更新训练词典里面的所有单词，这个复杂度是无法忍受的，所以我们换了一种衡量概率的方式，用二叉树路径连乘来表示最后的概率，从以前训练词语的权值矩阵，转化到训练二叉树的路径权重。</p><h4 id="简单展开CBOW"><a href="#简单展开CBOW" class="headerlink" title="简单展开CBOW"></a>简单展开CBOW</h4><p>假设：</p><ul><li>Context(w)由单词w的前后各c个词构成。</li><li>(Context(w)，w)为训练语料中的一个训练样例</li></ul><p>三个分层为：输入层，投影层，输出层</p><ul><li>输入层： 为Context(w)中的2c个词的词向量𝑣 (𝐶ontext(𝑤) 1) , 𝑣 (𝐶ontext( 𝑤 )2) , …𝑣 (𝐶ontext( 𝑤 )2𝑐−1) , 𝑣(𝐶ontext(𝑤)2𝑐)</li><li>投影层： 将输入层的2c个向量做求和，即Σ𝑣(𝐶𝑜𝑛𝑡𝑒𝑥𝑡(𝑤)𝑖)</li><li>输出层： 输出层对应一棵二叉树，它是以语料中出现过的词当叶子结点，以各词在语料中出现的次数当权值构造出的Huffman树。</li></ul><p>具体的详细过程可以看<a href="http://hlt.suda.edu.cn/~xwang/slides/word2vector.pdf" target="_blank" rel="noopener">这个连接</a>，实际上还是根据概率的大小的来做预测，只不过概率模型做了深思熟虑的选择， 换句话说所有的学习都是建立在概率模型选择的基础之上的。而关于这个过程有几个问题要考虑：</p><ul><li>输入层的词向量是怎么来的？</li><li>最后公式中为什么要用样本词向量的”和”乘以上文的词向量？</li></ul><p>第一个问题的答案是我们认为初始化的，大多采用uniform分布来参考。第二个问题的答案是神经网络中所有的都是：线性变换+非线性，这样才能拟合任意函数，这是一方面，另一方面，这么做正是word2vec优化的地方所在，传统的神经网络语言模型是将所有的词向量组合成矩阵，每次训练都有大纬度的矩阵参与训练，这样太复杂了。另外一个优点是，舍弃了神经网络中的隐藏层。</p><h4 id="Skip-gram"><a href="#Skip-gram" class="headerlink" title="Skip-gram"></a>Skip-gram</h4><p>目的跟上文的CBOW相反，但是步骤是一样的，但是SG的复杂度更高了，因为它要预测所有上下文的词语，多了一层循环，即一对多。详细过程要知道如何推导。</p><h3 id="基于Negative-Sampling的模型"><a href="#基于Negative-Sampling的模型" class="headerlink" title="基于Negative Sampling的模型"></a>基于Negative Sampling的模型</h3><p>所以我一直搞不明白什么叫做Negative Sampling，就是因为取了负样本  而负样本的作用是什么？博客上说NS模型可以提高训练速度，并且改善词向量的质量。</p><p>实际上，Word2vec 本质上是一个语言模型，它的输出节点数是 V 个，对应了 V 个词语，本质上是一个多分类问题，但实际当中，词语的个数非常非常多，会给计算造成很大困难，所以需要用技巧来加速训练。</p><p>hierarchical softmax：本质是把 N 分类问题变成 log(N)次二分类</p><p>negative sampling：本质是预测总体类别的一个子集</p><p>那么针对标题开头的问题，NS 模型的本质，就是将训练集缩小到一个范围内，在这个范围内，目标词w作为正样本，其他词语作为负样本，而负样本的选择也有讲究，它摒弃了生冷词汇，按照单词出现的频率进行样本选择。</p><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>我们要做的一切都是要求似然函数的最值，而所有的关键都在于构造合适的概率函数，那么我们思考选择什么样的模型比较合适呢？考虑到概率函数都是前向相乘的过程，所以我们要让那些频率高的词汇尽可能的排在前面，这样的话就可以避免掉很多不必要的乘法次数，所以Huffman模型能够很好的满足我们的要求。模型确定了以后剩下的就是数学的事情了。但是这么理解不对，Huffman树只是输出层的问题，不是训练，训练层中我们通过叠加向量+去掉隐藏层，达到了简化的目的，而输出层我们是为了规避softmax大量计算才采用的Huffman树，而不是训练方式。</p><p>还有一点就是词在Huffman树中都是以叶子节点的形式存在。</p><p>而有些同学不理解实际上它的训练过程是什么样子的，确实网络上的博客大部分都是在讲原理而没有讲落，<a href="https://iksinc.online/tag/continuous-bag-of-words-cbow/" target="_blank" rel="noopener">这篇文章</a>能够生动地讲述如何训练的。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;为了表示对前辈的尊敬，  &lt;strong&gt;&lt;a href=&quot;https://www.zybuluo.com/Dounm/note/591752&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;这篇文章&lt;/a&gt;&lt;/strong&gt;建议所有做word2vector
+      
+    
+    </summary>
+    
+      <category term="Machine Learning" scheme="http://yoursite.com/categories/Machine-Learning/"/>
+    
+    
+      <category term="Algorithm" scheme="http://yoursite.com/tags/Algorithm/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>阅读论文技巧</title>
+    <link href="http://yoursite.com/2018/03/21/20180321%E9%98%85%E8%AF%BB%E8%AE%BA%E6%96%87%E6%8A%80%E5%B7%A7/"/>
+    <id>http://yoursite.com/2018/03/21/20180321阅读论文技巧/</id>
+    <published>2018-03-21T08:43:30.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文是<a href="http://blizzard.cs.uwaterloo.ca/keshav/home/Papers/data/07/paper-reading.pdf" target="_blank" rel="noopener">How to read a paper</a>的简洁笔记</p><h3 id="三步走战略"><a href="#三步走战略" class="headerlink" title="三步走战略"></a>三步走战略</h3><p>不要从头到尾的啃一篇论文，要有策略：</p><ul><li>粗读获取主旨</li><li>通读掌握内容</li><li>精读深度理解</li></ul><p>本文的最重要的观念在于，利用三段法阅读学术论文，每个阶段阅读都有其特殊的目的，且每一个目的都是以上一个阶段的结果为基础。</p><h4 id="第一阶段"><a href="#第一阶段" class="headerlink" title="第一阶段"></a>第一阶段</h4><p>第一阶段以快速扫描整篇文章，并获悉整篇论文的架构。也可以借此决定是否进行下一段的阅读，这个阶段大概需要5~10分钟，并且要严格遵循以下步骤。</p><ul><li><font color="red"><strong>仔细地</strong></font>阅读<font color="navy">标题，大纲与前言</font></li><li>阅读文章中的<font color="red">章节标题</font>，但不需要理会其中内容</li><li>阅读<font color="red">结论</font></li><li>快速扫过参考资料，并在心中勾选过阅读过的。</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">我觉得第四点还是算了，因为大部分人并不是做研究的，核心目的还是掌握文章主旨为上。</span><br></pre></td></tr></table></figure><p>第一阶段完成后，<font color="red">必须有能力回答以下几个问题</font>：</p><ul><li>论文属性：本篇论文属于那种类型？是量化测量类型的研究？还是新算法的提出？还是综述？</li><li>研究背景：哪一篇文章与本文有关？本文是基于那种理论进行研究的？</li><li>贡献：本文提出了什么新的观点？解决了什么问题？</li><li>清晰度：该论文的文笔是否清晰</li></ul><p>根据以上几点，如果你在5分钟内还不知道这篇论文在讲什么，那这篇论文不必要再看了。</p><h4 id="第二阶段"><a href="#第二阶段" class="headerlink" title="第二阶段"></a>第二阶段</h4><p>此阶段将更关注论文本身的内容，但是仍然忽略一些细节，如证明过程等等。这样做能够帮助你略记论文的关键处，或是加一些标注。但是还有几下几点需要特别注意的：</p><ul><li>请仔细阅读论文中的示意图，分析图，或是其他图表类型的内容。</li><li>请记得画哪些没有读到的有关参考资料，为将来进一步阅读做准备</li></ul><p>这段将耗费你大约一个小时，然后你可以领略改论文的内容。你应该有能力总结论文的主要理论，所支持的验证以及一些其他内容。有时候你无法在第二阶段结束后了解论文。这有可能是主题使用的不熟悉或是缩写，对你而言是新的，或是论文作者使用到证明和实验技巧是你无法理解，以至于你无法意会。或者是你本身太累，不在状态。此时你有三个选择：</p><ul><li>先把论文摆在一遍，再也不看了</li><li>回到论文本身，之后再继续涉猎相关的背景或者素材</li><li>进行第三阶段的阅读</li></ul><h4 id="第三阶段"><a href="#第三阶段" class="headerlink" title="第三阶段"></a>第三阶段</h4><p>为了彻底了解论文讲的是什么，特别是当一位期刊审查人时候，这一阶段就显得尤为重要了。第三阶段阅读的关键在于企图将论文实际重新验证一次，这个过程需要特别重视文章中的细枝末节。这个过程的耗时过程跟经验息息相关，阅读完后，应该可以凭借对论文的印象，勾勒出该论文的架构，并且可以指出论文的优缺点。特别是你应该有能力指出该论文中隐含的假说，遗漏的相关文献。如果是财务领域，应该联想到相关的类似的统计或者计量技术。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;本文是&lt;a href=&quot;http://blizzard.cs.uwaterloo.ca/keshav/home/Papers/data/07/paper-reading.pdf&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;How to read a pa
+      
+    
+    </summary>
+    
+      <category term="Muse" scheme="http://yoursite.com/categories/Muse/"/>
+    
+    
+      <category term="Skills" scheme="http://yoursite.com/tags/Skills/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>A股游资整理</title>
+    <link href="http://yoursite.com/2018/03/21/20180321A%E8%82%A1%E6%B8%B8%E8%B5%84%E6%95%B4%E7%90%86/"/>
+    <id>http://yoursite.com/2018/03/21/20180321A股游资整理/</id>
+    <published>2018-03-21T08:35:41.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Huffman算法</title>
+    <link href="http://yoursite.com/2018/03/21/20180321Huffman%E7%AE%97%E6%B3%95/"/>
+    <id>http://yoursite.com/2018/03/21/20180321Huffman算法/</id>
+    <published>2018-03-21T08:19:13.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>Huffman编码首先要构建Huffman树，根据频次的由小到大排列元素数据，构建二叉树，这样就能保证权重大的（频次高）的元素，会靠近树根，这样的话频次高的路径编码（左0右1）就短。</p><p>解释的比较好的文章请<a href="http://blog.csdn.net/FX677588/article/details/70767446" target="_blank" rel="noopener">点击这里</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Huffman编码首先要构建Huffman树，根据频次的由小到大排列元素数据，构建二叉树，这样就能保证权重大的（频次高）的元素，会靠近树根，这样的话频次高的路径编码（左0右1）就短。&lt;/p&gt;
+&lt;p&gt;解释的比较好的文章请&lt;a href=&quot;http://blog.csdn.ne
+      
+    
+    </summary>
+    
+      <category term="Machine Learning" scheme="http://yoursite.com/categories/Machine-Learning/"/>
+    
+    
+      <category term="Algorithm" scheme="http://yoursite.com/tags/Algorithm/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Logistic Regression的思考</title>
+    <link href="http://yoursite.com/2018/03/21/20180321Logistic-Regression%E7%9A%84%E6%80%9D%E8%80%83/"/>
+    <id>http://yoursite.com/2018/03/21/20180321Logistic-Regression的思考/</id>
+    <published>2018-03-21T07:03:58.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>Spark Mllib 在做LR的时候，官方demo里给出了两个输出一个是coefficient 还有一个是intercept 那么这两个变量是什么意思？</p><p>我们回顾一下LR模型：hθ(x)=1/1+e(−θTx)</p><p>θTx 就是 θx + b  coefficient就是系数矩阵，而intercept就是截距的意思，就是这个b</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Spark Mllib 在做LR的时候，官方demo里给出了两个输出一个是coefficient 还有一个是intercept 那么这两个变量是什么意思？&lt;/p&gt;
+&lt;p&gt;我们回顾一下LR模型：hθ(x)=1/1+e(−θTx)&lt;/p&gt;
+&lt;p&gt;θTx 就是 θx + b  c
+      
+    
+    </summary>
+    
+      <category term="Machine Learning" scheme="http://yoursite.com/categories/Machine-Learning/"/>
+    
+    
+      <category term="Algorithm" scheme="http://yoursite.com/tags/Algorithm/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>聊聊债券收益率</title>
+    <link href="http://yoursite.com/2018/03/18/20180318%E8%81%8A%E8%81%8A%E5%80%BA%E5%88%B8%E6%94%B6%E7%9B%8A%E7%8E%87/"/>
+    <id>http://yoursite.com/2018/03/18/20180318聊聊债券收益率/</id>
+    <published>2018-03-18T15:17:46.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>美国克林顿政府时期的总统政策顾问James Carville曾经讲过一句话：</p><p>如果有来生，我曾经希望当美国总统、罗马教皇或棒球高分击球员，但现在，我只想托生在债券市场，因为它可以吓唬住任何人（I used to think if there was reincarnation， I wanted to come back as the President or the Pope or a .400 baseball hitter. But now，I want to come back as the bond market. You can intimidate everybody.）！</p><p>绝大多数人对这句话无感。</p><p>在大家的印象中，总觉得债券这玩意儿，固定收益的东西，乏味得很，哪有股票、期货和外汇市场的波动来得精彩刺激、激动人心，更是很少关心债券市场的情况……</p><p>然而，随着这么多年对金融市场了解得越来越深，我对这句话却愈加深有感触，而且发现自己以往认知的肤浅——特别是，我们用定期存款的思维去理解债券，这实在太低估了债券市场的波动和影响，甚至会造成完全错误的理解。</p><p>比方说，2011年和2013年，中国评级机构大公国际先后两次调低美国本、外币的主权信用等级，从A+调整到A，然后再到A-。当时很多爱国人士开始大声叫好，美国主权评级越低，那么美国国债收益率越高，这对目前大量持有美债的中国有利……</p><p>　　听见这种话，如果真爱国而且懂金融的人，恨不得暴揍这些蠢货一顿！</p><p>　　第一，所有已出售国债，其票面利率是保持不变的，美国国债收益率再涨，美国财政部也不会给持有债券者多付一分钱利息；</p><p>　　第二，信用评级下调，国债收益率上涨，意味着国债本身价格的下跌——100元面值的国债售价98，意味着收益率=（100-98）/98=2.04%；如果售价95，意味着收益率=（100-95）/95=5.25%，所以如果收益率暴涨，就是国债价格暴跌，对中国持有的美国国债只有坏处没有好处！</p><p>　　最基本也应该知道：</p><p>　　国债收益率上涨===国债价格下跌！</p><p>　　2010年面临破产之时，希腊国债收益率高达1000%，这意味着，面值100欧元的希腊国债，在市场上售价连10元都不到，你居然还说持有希腊国债是好事，你说这些蠢货们的金融知识该有多匮乏！</p><p>　　实际上，你经常在财经媒体中听到的那个“债券收益率”，其得来就是因为债券价格的变动而计算得出——如果某个债券收益率暴涨，常常意味着这个债券偿付能力有问题，价格自然就是暴跌啊！</p><p>　　有人该疑惑了，国债收益率不是国债发售的时候就已经确定了么？</p><p>　　嘿嘿，你问到点上了，债券收益率，就是个金融知识的深坑啊！</p><p>　　以国债为例，一般来说有5种收益率。<br>　　<br>　　1）名义收益率：</p><p>　　通常称之为票面利率，这是国债一开始发行就确定的收益率。</p><p>　　例如：某10年期中国国债，面值100元发售，每年支付一次利息，持有人每年某个固定日期都会从财政部收到5元钱的收益，这就意味着名义收益率5%。</p><p>　　2）即期收益率：意思是按照现在的国债价格和票面收益算出来的收益率。</p><p>　　例如：某十年期中国国债，面值100元，票面利率5%，而当前市场价格96元，那么，即期收益率=5/96=5.2%。</p><p>　　3）到期收益率：这个稍复杂一点儿，要考虑当前债券价格和持有到期后财政部返还所有本息的价差和距离到期的剩余年份。</p><p>　　例如：某十年期中国国债，面值100元，票面利率5%，当前市场上价格96元，还有8年到期，那么，到期收益率=[5+（100-96）/8]/96=5.73%。</p><p>　　<font color="navy"><strong>同学们，敲黑板了，我们通常在财经新闻中听到的那个“国债收益率”或“债券收益率”，通常情况下就是指“到期收益率”！</strong></font></p><p>　　4）认购者收益率：在绝大多数时候，100元面值的国债，财政部是不会按照100元来卖的，而是要根据当前市场上的国债收益率价格进行调整，还要根据各购买国债的金融机构投标情况来确定价格。这个收益率，指的是认购者买国债之后，持有到期的收益率。这需要考虑财政部出售债券价格、本来的票面收益率等因素。</p><p>　　例如：某十年期中国国债，面值100元，票面利率5%，购买者从财政部购买的价格是102元，那么，认购者收益率=[5+（100-102）/10]/102=4.71%。</p><p>　　<font color="navy"><strong>再次敲黑板了，这个收益率，就是通常所谓的“国债发行利率”</strong></font>。</p><p>　　5）持有期收益率：国债价格本身有涨跌，有人就会想着在涨涨跌跌中赚差价，而这个收益率就是在你赚取差价时候的收益率。</p><p>　　例如：某十年期中国国债，面值100元，票面利率5%，每年付息一次。我以96元在年初买进，除了获得国债利息收入外，我还预计2年后会涨到102元，并在那时卖出，这样一来，持有期收益率=[5+（102-96）/2]/96=8.33%。</p><p>　　<font color="navy"><strong>还要敲黑板，这个收益率，就是投资者买卖债券所获取的投资收益率</strong></font>。</p><p>　　债券收益率的概念，基本就这点儿知识了。</p><p>　　很多人可能不知道，美国债券市场远比股票市场的规模大。</p><p>　　仅美国国债市场，2017年年中其规模已经达到19.8万亿美元，如果进一步加上公司债、市政债（地方债）、联邦机构债、公司债以及房地产抵押证券（MBS）和资产支持证券（ABS），总规模超过40万亿美元。</p><p>　　相比之下，在全世界投资者心目中这么牛逼的纽约交易所，目前其股票总市值也不过20万亿美元左右，加上纳斯达克的9万亿，总额也就30万亿美元的样子。</p><p>　　那——为什么我们都知道美国股市，却很少人听说过美国债市。</p><p>　　答案并不奇怪——</p><p>　　因为，债市交易者绝大部分都是诸如银行、保险公司、投资银行（券商）、信托公司、大型对冲基金这样的机构用户，乃至各国政府（美元国债很活跃的购买对象），却极少个人投资者在债市里折腾。</p><p>　　但你想想嘛，真正决定市场运行的，是机构还是散户？</p><p>　　正是因为都是大手笔的机构投资者在市场上折腾，所以一旦债市收益率出现较大波动，常常能够在整个金融市场掀起滔天巨浪，相比之下，股市的波动反而影响没有那么大。</p><p>　　<font color="red"><strong>在一个市场经济国家里，债券市场才是资本市场的核心，而十年期国债收益率则是金融市场上资产定价的锚，我称之为“定海神针”，无论债券、股票、期货还是房地产，其价格都会受到“定海神针”的影响</strong></font>。</p><p>　　不考虑通胀的话，影响方向很确定：</p><p>　　定海神针下移，资产价格上升；</p><p>　　定海神针上移，资产价格下跌。</p><p>　　为什么会这样呢？</p><p>　　因为有中央政府和央妈印钞作保证，10年期国债的收益率通常被称为“无风险收益率”——也就是说，购买10年期国债，我的收益率是不用承担风险的；</p><p>　　与无风险收益率相对，一个人如果购买非国债的其他债券、股票、房子等资产，他需要承担价格涨跌风险，当然也要求获得比国债更高的收益率，所以嘛——</p><p>　　10年期国债收益率，就成为了各类资产收益率的铁底。</p><p>　　如果国债收益率升高，将意味着债券收益率、股票的收益率（市盈率的倒数）、期货升贴水率、房子收益率（租金房价比）的底部都要抬高，这一抬高不要紧，在同样收益（债券票面收益、公司股票分红、房产租金等）的情况下，将意味着债券、股票、房子的价格的下跌（原理与前面讲债券价格下跌一样）……</p><p>　　否则的话，如果这些资产的收益率比无风险利率还要低，金融机构肯定选择卖出股票、卖出房子、卖出债券——归根结底还是会导致资产价格下跌。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;美国克林顿政府时期的总统政策顾问James Carville曾经讲过一句话：&lt;/p&gt;
+&lt;p&gt;如果有来生，我曾经希望当美国总统、罗马教皇或棒球高分击球员，但现在，我只想托生在债券市场，因为它可以吓唬住任何人（I used to think if there was reinc
+      
+    
+    </summary>
+    
+      <category term="Muse" scheme="http://yoursite.com/categories/Muse/"/>
+    
+    
+      <category term="Investment" scheme="http://yoursite.com/tags/Investment/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>最近投资理念的一些思考</title>
+    <link href="http://yoursite.com/2018/03/17/20180317%E6%9C%80%E8%BF%91%E6%8A%95%E8%B5%84%E7%90%86%E5%BF%B5%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%9D%E8%80%83/"/>
+    <id>http://yoursite.com/2018/03/17/20180317最近投资理念的一些思考/</id>
+    <published>2018-03-17T14:18:04.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>2017年上半年的时候，上证50并不是获得很多人的认可，周阳老师说了一句话，你敢看空上证50？</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180317touzi01.jpg" alt="高山仰止"></p><p>彼时的疯狂都在围绕着“千年大计”展开。与安邦的龙江通话，讲起了华夏幸福的事情，持续买几年的华夏幸福也是很有本事的一件事情。如果我们彼时买入50的话，现在的收益是多少不在话下，看图说话。2018年出因为加息刺激和量化算法导致美股的崩盘，情绪传到到中国来，自己没有应对这种系统系风险的经验，应该在第二天就采取应对措施的，A股市场的上的反应也比较迟钝，在盘后看到了葛卫东清仓，才有了一些恐惧，后来自己的股票遭到腰斩，同时自己又不自信的清仓，错上加错，形成双杀。</p><p>总体来讲，未来中国的国运处于上升阶段，这届领导班子的政绩也都看到了 ，钢哥也说了，未来一定是慢牛的。纵观我们的一生，就像指数一样，一些我们当时认为迈不过去的坎坷，事后看去都是风淡云轻。所以人在遇到了坎坷，投资也好，人生也好，一定要把时间轴拉长了看，这样的话就会高屋建瓴。这一点是要深信不疑的。</p><p>就投资再多说两句，长牛的意义不仅限于上证指数的慢牛，看看美国的股指：</p><ul><li>道琼斯：目前由30家巨头公司组成，类似于我们的上证50</li><li>纳斯达克：主要是科技股，类似我们的创业板</li><li>标准普尔：股票的大杂烩，类似于沪深300，是美国经济的整体情况</li></ul><p>如果对标美国股指的话，我们的车才刚刚启动，而18年创业板才刚刚启动，前途一片光明。但是前途是光明的，道路是曲折的，美元已经渐渐有了加息的趋势了，存量资金在A股市场上的换道行驶必然会让别的股票受损。所以中国能不能走出来自己的道路，人民币能不能摆脱美元的束缚，天佑我中华了。所以言归正传，未来的上证我还是继续看好，<font color="navy"><strong>而创业板科技股也要保持很好的研究，因为新经济的刺激需要的是创新而不是守成</strong></font>。</p><p>为了不在文中班门弄斧，这里将任泽平先生17年末的讲话，以自己的观点和角度，做一个总结：</p><p>中国要增速换挡，08年以前的房产刺激不会再出现了，房地产的投资高潮已经过去了，未来房地产行业会向着行业集中度发展。</p><p>一轮产能周期分为四个阶段，第一个阶段就是在经济繁荣的时候，企业家过度乐观，认为做出决策的能力高人一筹，这时候进行大规模的产能扩张，随后引发产能过剩；进入第二个阶段，产能过剩以后，供需格局恶化，中小企业退出，淘汰落后产能出清；进入第三个阶段，产能出清的尾声，行业集中度提升，剩者为王，企业利润改善，银行不良率下降，修复资产负债表，为新一轮产能扩张积蓄力量；到了第四个阶段，持续的盈利改善和资产负债表修复，最终将会迎来新一轮的产能扩张。</p><p>房地产：长期看人口，中期看土地，短期看金融。</p><p>三月份任先生的讲座还需要做以总结，最近创业板的事情，印证了钢哥说的一点，就是股价的波动就是人心的波动，正所谓“圣人无心，以众人之心为心”，独角兽和创业板的情绪都没有把握住，可以说是对人心的不理解，也可以说是自己的不自信。本来就是个博弈的过程，希望自己未来能够更决断一点。但是，风控仍然是第一位的。想获得高收益，高风险博弈是少不掉的。</p><p>同时，在看了任博士的调研精神以及调研深度上，自己的钻研和调查积累还差的远，离周阳老师那个熟练度也差的远，我觉得价值投资有一个方面是人性懒惰的体现。对于A股市场上的股票，我目前建议按照数据库样式自己整理一份出来，同时加上板块叠加字段（其实这种操作已经有人做了，类似于各大财经软件上的条件选股，但是我这个远没有他们的复杂，我仅仅是对整个市场的概念有一个大体的了解），具体的操作同花顺已经可以按照星级下载了，剩下的自行整理，日进一步。</p><p>18年年初的时候，资金会有个前辈说严谨就不会亏钱，这个严谨二字如何定义，还需斟酌。或许针对的就是目前我这种在雪球上抄作业的人吧。亏损的时候大家都坐不住，投资真的需要信念支撑，快钱也要学会赚。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;2017年上半年的时候，上证50并不是获得很多人的认可，周阳老师说了一句话，你敢看空上证50？&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20
+      
+    
+    </summary>
+    
+      <category term="Muse" scheme="http://yoursite.com/categories/Muse/"/>
+    
+    
+      <category term="Investment" scheme="http://yoursite.com/tags/Investment/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring Boot始于足下</title>
+    <link href="http://yoursite.com/2018/03/15/20180315SpringBoot%E5%A7%8B%E4%BA%8E%E8%B6%B3%E4%B8%8B/"/>
+    <id>http://yoursite.com/2018/03/15/20180315SpringBoot始于足下/</id>
+    <published>2018-03-15T09:00:59.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>以前我们做Spring的时候，无论项目大小，都要经历以下过程：</p><ul><li>配置web.xml，加载spring和spring mvc</li><li>配置数据库连接、配置spring事务</li><li>配置加载配置文件的读取，开启注解</li><li>配置日志文件</li></ul><p>…</p><p>配置完成之后部署tomcat 调试</p><p>…</p><p>无论项目大小，我们都要经历上面复杂的项目流程。</p><p>那么我们用了Spring Boot的时候，情况就会改善很多。Spring的入门可以根据IBM和</p><p>老生常谈的MVC，温故知新：</p><p>view：视图。这个很容易理解，其实view层就是用户用户可以看到的东西。后台怎么处理不关心，只关心怎么样想用户展示信息。</p><p> controller：也可以成为action层，业务模块流程。我经常喜欢用控制视图的跳转来简单形容，但是这个是不全面的，因为他除了控制视图的转换之外，还控制了业务的逻辑，但是，这里的控制业务逻辑不是业务逻辑的实现，而仅仅是一个大的模块，你看到之后，知道它实现了这个业务逻辑，但是怎么实现的，不需要关心，仅仅需要调用service层里的一个方法即可，这样使controller层看起来更加清晰。</p><p>service：业务逻辑层。接着controller层中，可以想到，service层是业务逻辑（商务逻辑）的具体实现。它向上层的controller层提供接口，并且使用dao层提供的接口。存在的必要性：有时候，我认为更多的时刻，service层中仅仅是调用dao层中的一个方法，那么它是否有必要存在呢？答案是肯定的。因为，假如将来客户的业务有一定的变动，那么这样一来，你只需要在service层中进行一些变动即可。记住，你写程序不应该仅仅为实现功能考虑，更多的还是应该为将来的维护考虑，因为大部分的时间还是在维护上的。</p><p>dao：数据访问对象。也就是我们经常说的数据持久层，负责与数据库进行联络的一些任务都封装在此，DAO层的设计首先是设计DAO的接口，然后在Spring的配置文件中定义此接口的实现类，然后就可在模块中调用此接口来进行数据业务的处理，而不用关心此接口的具体实现类是哪个类，显得结构非常清晰，DAO层的数据源配置，以及有关数据库连接的参数都在Spring的配置文件中进行配置。 </p><p><code>这些层次的理解还需要结合实际开发后来感受一下</code></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;以前我们做Spring的时候，无论项目大小，都要经历以下过程：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;配置web.xml，加载spring和spring mvc&lt;/li&gt;
+&lt;li&gt;配置数据库连接、配置spring事务&lt;/li&gt;
+&lt;li&gt;配置加载配置文件的读取，开启注解&lt;/li&gt;
+&lt;li
+      
+    
+    </summary>
+    
+      <category term="Coding" scheme="http://yoursite.com/categories/Coding/"/>
+    
+    
+      <category term="Spring" scheme="http://yoursite.com/tags/Spring/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>梯度下降算法的三种形式：BGD, SGD, MBGD</title>
+    <link href="http://yoursite.com/2018/03/13/20180313%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E7%AE%97%E6%B3%95%E7%9A%84%E4%B8%89%E7%A7%8D%E5%BD%A2%E5%BC%8F%EF%BC%9ABGD%EF%BC%8CSGD-MBGD/"/>
+    <id>http://yoursite.com/2018/03/13/20180313梯度下降算法的三种形式：BGD，SGD-MBGD/</id>
+    <published>2018-03-13T07:27:10.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>在求解机器学习算法的模型参数，即无约束优化问题时，梯度下降（Gradient Descent）是最常采用的方法之一，另一种常用的方法是最小二乘法。这里就对梯度下降法做一个完整的总结。</p><h4 id="BGD-批量梯度下降算法"><a href="#BGD-批量梯度下降算法" class="headerlink" title="BGD 批量梯度下降算法"></a>BGD 批量梯度下降算法</h4><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313gradient01.jpg" alt="高山仰止"></p><p>首先来看看梯度下降的一个直观的解释。比如我们在一座大山上的某处位置，由于我们不知道怎么下山，于是决定走一步算一步，也就是在每走到一个位置的时候，求解当前位置的梯度，沿着梯度的负方向，也就是当前最陡峭的位置向下走一步，然后继续求解当前位置梯度，向这一步所在位置沿着最陡峭最易下山的位置走一步。这样一步步的走下去，一直走到觉得我们已经到了山脚。当然这样走下去，有可能我们不能走到山脚，而是到了某一个局部的山峰低处。</p><p>从上面的解释可以看出，梯度下降不一定能够找到全局的最优解，有可能是一个局部最优解。当然，如果损失函数是凸函数，梯度下降法得到的解就一定是全局最优解。</p><h5 id="梯度下降的相关概念"><a href="#梯度下降的相关概念" class="headerlink" title="梯度下降的相关概念"></a>梯度下降的相关概念</h5><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313gradient02.jpg" alt="高山仰止"></p><p>算法的具体过程可以见下图：</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313gradient03.jpg" alt="高山仰止"></p><p>BGD最关键的地方在于理解，为什么梯度参数更新的时候用原参数 - 损失函数关于参数的偏导数。因为函数关于某一点的导数的意义在于这一点的变化率，那么关于参数的导数就是参数的变化率，而乘以步长的意义在于参数变化了多少。</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313gradient04.jpg" alt="高山仰止"></p><p>那么我们可以看到，每更新一次参数就要用到所有的训练数据，这样的话是非常耗时的。</p><h4 id="SGD-Stochastic-Gradient-Descent-随机梯度下降算法"><a href="#SGD-Stochastic-Gradient-Descent-随机梯度下降算法" class="headerlink" title="SGD Stochastic Gradient Descent 随机梯度下降算法"></a>SGD Stochastic Gradient Descent 随机梯度下降算法</h4><p>由于批梯度下降每跟新一个参数的时候，要用到所有的样本数，所以训练速度会随着样本数量的增加而变得非常缓慢。随机梯度下降正是为了解决这个办法而提出的。它是利用每个样本的损失函数对θ求偏导得到对应的梯度，来更新θ：</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313gradient05.jpg" alt="高山仰止"></p><p>也就是说在SGD中，算法不再考虑每个样本的意见了，而是见好就收，针对当前样本进行上文所述的修正。显而易见的，这种方法在速度上取得了绝对的优势，但是在收敛性上显得过于随意。随机梯度下降是通过每个样本来迭代更新一次，对比上面的批量梯度下降，迭代一次需要用到所有训练样本（往往如今真实问题训练数据都是非常巨大），一次迭代不可能最优，如果迭代10次的话就需要遍历训练样本10次。但是，SGD伴随的一个问题是噪音较BGD要多，使得SGD并不是每次迭代都向着整体最优化方向。</p><h4 id="MBGD-Mini-batch-Gradient-Descent"><a href="#MBGD-Mini-batch-Gradient-Descent" class="headerlink" title="MBGD Mini-batch Gradient Descent"></a>MBGD Mini-batch Gradient Descent</h4><p>上面两种算法各有优缺点，而MBGD就是中和了上面两种方法的，也就是说我们更新参数的时候，能够自己选择使用样本的个数</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313gradient06.jpg" alt="高山仰止"></p><h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ol><li><p>批梯度下降每次更新使用了所有的训练数据，最小化损失函数，如果只有一个极小值，那么批梯度下降是考虑了训练集所有数据，是朝着最小值迭代运动的，但是缺点是如果样本值很大的话，更新速度会很慢。</p></li><li><p>随机梯度下降在每次更新的时候，只考虑了一个样本点，这样会大大加快训练数据，也恰好是批梯度下降的缺点，但是有可能由于训练数据的噪声点较多，那么每一次利用噪声点进行更新的过程中，就不一定是朝着极小值方向更新，但是由于更新多轮，整体方向还是大致朝着极小值方向更新，又提高了速度。</p></li><li><p>小批量梯度下降法是为了解决批梯度下降法的训练速度慢，以及随机梯度下降法的准确性综合而来，但是这里注意，不同问题的batch是不一样的，听师兄跟我说，我们nlp的parser训练部分batch一般就设置为10000，那么为什么是10000呢，我觉得这就和每一个问题中神经网络需要设置多少层，没有一个人能够准确答出，只能通过实验结果来进行超参数的调整。</p></li></ol><p><a href="https://zhuanlan.zhihu.com/p/25765735" target="_blank" rel="noopener">参考此文</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;在求解机器学习算法的模型参数，即无约束优化问题时，梯度下降（Gradient Descent）是最常采用的方法之一，另一种常用的方法是最小二乘法。这里就对梯度下降法做一个完整的总结。&lt;/p&gt;
+&lt;h4 id=&quot;BGD-批量梯度下降算法&quot;&gt;&lt;a href=&quot;#BGD-批量梯度下
+      
+    
+    </summary>
+    
+      <category term="Machine Learning" scheme="http://yoursite.com/categories/Machine-Learning/"/>
+    
+    
+      <category term="Algorithm" scheme="http://yoursite.com/tags/Algorithm/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>FM和FFM算法精髓</title>
+    <link href="http://yoursite.com/2018/03/13/20180313FM%E5%92%8CFFM%E7%AE%97%E6%B3%95%E7%B2%BE%E9%AB%93/"/>
+    <id>http://yoursite.com/2018/03/13/20180313FM和FFM算法精髓/</id>
+    <published>2018-03-13T07:26:27.000Z</published>
+    <updated>2018-07-06T17:24:34.159Z</updated>
+    
+    <content type="html"><![CDATA[<p>FM和FFM在CTR预估上有着非常不错的效果，<a href="https://tech.meituan.com/deep-understanding-of-ffm-principles-and-practices.html" target="_blank" rel="noopener">美团的文章</a>，讲的十分详细了，这里简明扼要的记录一下理解的过程，以及两种算法的重点。</p><p>FM解决的问题，如帖子中所说，是特征在one-hot编码后的稀疏问题，那么稀疏会导致什么问题？就是训练模型系数的时候少了不少样本。那么FM借鉴了矩阵分解的方式，将所有不为0的系数Wij组合成一个对称矩阵，然后将其拆分。拆分的意义在于，将原来的高维系数矩阵分解成由众多低维矩阵隐向量相乘的结果，而每一个隐向量vi，可以由包含xi样本且不为0的关联特征样本训练而得，亦即vi这个低维隐向量就有充分的训练集，这就充分利用了系数矩阵中不为0的样本。举例说明：就xi和xj而言，二项式情况下我们如果想训练系数Wij，就需要大量的xi != 0 || xj != 0的样本，而当拆分成&lt;vi, vj&gt;后，当我们想训练vi，我们只需要保证xi != 0即可。</p><p>FFM解决的问题，是在FM的基础上，增加Field的概念。说白了，就是将几个Field进行组合后，再在组合而成的Field的基础之上进行FM，实际上是增加了训练样本，使得结果更精确，但是它的训练时间比较尴尬：O(kn^2)，而FM是线性的：O(kn)</p><p>从数学的角度，可以更加细致的去理解，参考下面两幅图：</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313FM01.jpg" alt="高山仰止"></p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313FM02.jpg" alt="高山仰止"></p><p>由于时间关系，算法的实现和应用我这里就不赘述，有空再补。具体可以参考上面帖子链接，讲解的非常好。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;FM和FFM在CTR预估上有着非常不错的效果，&lt;a href=&quot;https://tech.meituan.com/deep-understanding-of-ffm-principles-and-practices.html&quot; target=&quot;_blank&quot; rel=&quot;no
+      
+    
+    </summary>
+    
+      <category term="Machine Learning" scheme="http://yoursite.com/categories/Machine-Learning/"/>
+    
+    
+      <category term="Algorithm" scheme="http://yoursite.com/tags/Algorithm/"/>
+    
+  </entry>
+  
+</feed>
