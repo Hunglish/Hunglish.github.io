@@ -107,18 +107,18 @@
 
 
 
-<meta name="description" content="特征选择特征选择是我们进行机器学习训练前必须要考虑的一个步骤，周志华说特征选择是避免维度灾难和去重冗余特征，但是这两点都是为避免学习复杂度。但是也不能盲目去掉冗余特征，要根据结果考虑。如果计算体积的话，长宽底面积高，我们可以去掉长宽，保留底面积。 特征选择的过程本质上讲，离不开两个步骤：  子集搜索 子集评价  子集搜索一般都是贪心和穷举法，而子集评价的方法非常多，比较好用的一种就是计算信息增">
+<meta name="description" content="特征选择特征选择是我们进行机器学习训练前必须要考虑的一个步骤，周志华说特征选择是避免维度灾难和去重冗余特征，但是这两点都是为避免学习复杂度。但是也不能盲目去掉冗余特征，要根据结果考虑。如果计算体积的话，长宽底面积高，我们可以去掉长宽，保留底面积。 特征选择的过程本质上讲，离不开两个步骤：  子集搜索 子集评价  子集搜索一般都是贪心和穷举法，而子集评价的方法非常多，比较好用的一种就是计算信息增益。">
 <meta name="keywords" content="Algorithm">
 <meta property="og:type" content="article">
 <meta property="og:title" content="特征选择与稀疏学习">
 <meta property="og:url" content="http://yoursite.com/2018/06/25/20180625特征选择与稀疏学习/index.html">
 <meta property="og:site_name" content="无所住而生其心">
-<meta property="og:description" content="特征选择特征选择是我们进行机器学习训练前必须要考虑的一个步骤，周志华说特征选择是避免维度灾难和去重冗余特征，但是这两点都是为避免学习复杂度。但是也不能盲目去掉冗余特征，要根据结果考虑。如果计算体积的话，长宽底面积高，我们可以去掉长宽，保留底面积。 特征选择的过程本质上讲，离不开两个步骤：  子集搜索 子集评价  子集搜索一般都是贪心和穷举法，而子集评价的方法非常多，比较好用的一种就是计算信息增">
+<meta property="og:description" content="特征选择特征选择是我们进行机器学习训练前必须要考虑的一个步骤，周志华说特征选择是避免维度灾难和去重冗余特征，但是这两点都是为避免学习复杂度。但是也不能盲目去掉冗余特征，要根据结果考虑。如果计算体积的话，长宽底面积高，我们可以去掉长宽，保留底面积。 特征选择的过程本质上讲，离不开两个步骤：  子集搜索 子集评价  子集搜索一般都是贪心和穷举法，而子集评价的方法非常多，比较好用的一种就是计算信息增益。">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-07-06T17:24:34.159Z">
+<meta property="og:updated_time" content="2018-07-24T16:45:49.260Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="特征选择与稀疏学习">
-<meta name="twitter:description" content="特征选择特征选择是我们进行机器学习训练前必须要考虑的一个步骤，周志华说特征选择是避免维度灾难和去重冗余特征，但是这两点都是为避免学习复杂度。但是也不能盲目去掉冗余特征，要根据结果考虑。如果计算体积的话，长宽底面积高，我们可以去掉长宽，保留底面积。 特征选择的过程本质上讲，离不开两个步骤：  子集搜索 子集评价  子集搜索一般都是贪心和穷举法，而子集评价的方法非常多，比较好用的一种就是计算信息增">
+<meta name="twitter:description" content="特征选择特征选择是我们进行机器学习训练前必须要考虑的一个步骤，周志华说特征选择是避免维度灾难和去重冗余特征，但是这两点都是为避免学习复杂度。但是也不能盲目去掉冗余特征，要根据结果考虑。如果计算体积的话，长宽底面积高，我们可以去掉长宽，保留底面积。 特征选择的过程本质上讲，离不开两个步骤：  子集搜索 子集评价  子集搜索一般都是贪心和穷举法，而子集评价的方法非常多，比较好用的一种就是计算信息增益。">
 
 
 
@@ -435,7 +435,7 @@
                   <span class="post-meta-item-text">Words count in article&#58;</span>
                 
                 <span title="Words count in article">
-                  1,672 words
+                  1,645 words
                 </span>
               
 
@@ -472,9 +472,7 @@
       
 
       
-        <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-
-<h4 id="特征选择"><a href="#特征选择" class="headerlink" title="特征选择"></a>特征选择</h4><p>特征选择是我们进行机器学习训练前必须要考虑的一个步骤，周志华说特征选择是避免维度灾难和去重冗余特征，但是这两点都是为避免学习复杂度。但是也不能盲目去掉冗余特征，要根据结果考虑。如果计算体积的话，长宽底面积高，我们可以去掉长宽，保留底面积。</p>
+        <h4 id="特征选择"><a href="#特征选择" class="headerlink" title="特征选择"></a>特征选择</h4><p>特征选择是我们进行机器学习训练前必须要考虑的一个步骤，周志华说特征选择是避免维度灾难和去重冗余特征，但是这两点都是为避免学习复杂度。但是也不能盲目去掉冗余特征，要根据结果考虑。如果计算体积的话，长宽底面积高，我们可以去掉长宽，保留底面积。</p>
 <p>特征选择的过程本质上讲，离不开两个步骤：</p>
 <ul>
 <li>子集搜索</li>
@@ -503,18 +501,15 @@
 <p>这个算法有一个比较好的介绍，贴在这里：<a href="https://zhuanlan.zhihu.com/p/22445302" target="_blank" rel="noopener">压缩感知算法介绍</a></p>
 <h5 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h5><p>所以稀疏学习代表了一类问题的解决方式，就是特征矩阵过于稀疏，或是期望将特征矩阵变成稀疏的时候。下面我再结合经验谈谈稀疏学习，稀疏学习是近几年比较火热的一门技术，在信号处理（主要是压缩感知）、计算机视觉（比如JPEG压缩）领域影响比较大，而在机器学习领域里面，稀疏学习可以看做是一种<font color="navy"><strong>特征处理</strong></font>相关的模型。</p>
 <p>那么说人话，<font color="navy">稀疏表示</font>是在超完备字典D（超完备是说字典的行数小于列数）中用尽可能少的原子来表示信号x，即：</p>
-<p> $$min||α||_0\ \ \ \ \ s.t. \ \ x = Dα.$$  </p>
-<p>考虑噪声，就是</p>
-<p>$$min||x - Dα||_2^2+||α||_0$$</p>
-<p>α的size要比x大很多，但是α的非零元素要比x少很多，也就是说α是个外强中干（非常稀疏）的向量，所以稀疏表示的核心，就是用若干个（尽可能少）的向量，去表示原向量。</p>
+<script type="math/tex; mode=display">min||α||_0\ \ \ \ \ s.t. \ \ x = Dα.</script><p>考虑噪声，就是</p>
+<script type="math/tex; mode=display">min||x - Dα||_2^2+||α||\_{0}</script><p>α的size要比x大很多，但是α的非零元素要比x少很多，也就是说α是个外强中干（非常稀疏）的向量，所以稀疏表示的核心，就是用若干个（尽可能少）的向量，去表示原向量。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">稀疏即冗余</span><br></pre></td></tr></table></figure>
 <p>当样本具有这样的稀疏表达形式的时候，对于学习任务有不少的好处，例如<font color="navy"><strong>支持向量机之所以能在文本数据上有很好的性能，恰好是由于文本数据使用了稀疏表示，使大多数问题变得线性可分</strong></font>。</p>
 <p>而且稀疏表示在享受这么多好处的同时，并不会带来储存的负担。</p>
 <p>稀疏模型研究方向主要包括系数求解（即上面那个问题，经典算法有OMP贪心、lasso凸松弛和L1/2非凸松弛），字典学习（获得更好的D，经典算法有MOD和K-SVD交替迭代）和模型应用。</p>
 <p><font color="navy"><strong>显然稀疏表达的好坏与我们用的字典D有着密切的关系</strong></font>，字典分两类，一种是预先给定的分析字典，比如小波基、DCT等，另一种则是<font color="navy">针对特定数据集学习出特定的字典</font>。这种学出来的字典能大大提升在特定数据集的效果。</p>
 <p>关于字典学习的模型，跟书里讲的差不多, 最小化系数表达与原表达的误差。</p>
-<p>$$\max \limits_{D,W}||X-DW||_F^2\ \ \ \ s.t.||w_0|| \leq s$$</p>
-<p>这个目标函数非凸，一般用交替迭代思想来解，即分别固定D和W，更新另一个。在Word2Vec的算法中，也体现了这种思想。</p>
+<script type="math/tex; mode=display">\max \limits_{D,W}||X-DW||\_F^2\ \ \ \ s.t.||w_0|| \leq s</script><p>这个目标函数非凸，一般用交替迭代思想来解，即分别固定D和W，更新另一个。在Word2Vec的算法中，也体现了这种思想。</p>
 
       
     </div>
@@ -1122,6 +1117,26 @@
   
 
   
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
   
 
 
