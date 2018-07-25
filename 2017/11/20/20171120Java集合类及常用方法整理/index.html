@@ -509,8 +509,8 @@ numbers.put(“one”, new Integer(1));
 numbers.put(“two”, new Integer(2));
 numbers.put(“three”, new Integer(3));
 </code></pre><p>要取出一个数，比如2，用相应的key：</p>
-<pre><code>Integer n = (Integer)numbers.get(“two”); 
-System.out.println(“two = ” + n);
+<pre><code>    Integer n = (Integer)numbers.get(“two”); 
+    System.out.println(“two = ” + n);
 </code></pre><p>　　</p>
 <p><font color="navy">由于作为key的对象将通过计算其散列函数来确定与之对应的value的位置，因此任何作为key的对象都必须实现<strong>hashCode</strong>和<strong>equals</strong>方法</font>。hashCode和equals方法继承自根类Object，如果你用自定义的类当作key的话，要相当小心，按照散列函数的定义，如果两个对象相同，即obj1.equals(obj2)=true，则它们的hashCode必须相同，但如果两个对象不同，则它们的hashCode不一定不同，如果两个不同对象的hashCode相同，这种现象称为冲突，冲突会导致操作哈希表的时间开销增大，所以尽量定义好的hashCode()方法，能加快哈希表的操作。<br>如果相同的对象有不同的hashCode，对哈希表的操作会出现意想不到的结果（期待的get方法返回null），要避免这种问题，只需要牢记一条：要同时复写equals方法和hashCode方法，而不要只写其中一个。</p>
 <p><font color="purple"><strong><em>Hashtable是同步的</em></strong></font>。</p>
@@ -821,7 +821,7 @@ System.out.println(“two = ” + n);
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">135.7k</span>
+    <span title="Site words total count">135.5k</span>
   
 </div>
 

@@ -437,7 +437,7 @@
                   <span class="post-meta-item-text">Words count in article&#58;</span>
                 
                 <span title="Words count in article">
-                  5,411 words
+                  5,409 words
                 </span>
               
 
@@ -590,7 +590,7 @@ UNION All
 SELECT auction_string_id AS auction_id FROM auctions) b 
 ON a.auction_id=b.auction_id 
 </code></pre><p>比分别过滤数字 id，字符串 id 然后分别和商品表关联性能要好。</p>
-<p>这样写的好处：1 个 MapReduce 作业，商品表只读一次，推广效果表只读取一次。把 这个 SQL 换成 Map/Reduce 代码的话，Map 的时候，把 a 表的记录打上标签 a，商品表记录 每读取一条，打上标签 b，变成两个&lt;key,value&gt;对，&lt;(b,数字 id),value&gt;，&lt;(b,字符串 id),value&gt;。</p>
+<p>这样写的好处：1 个 MapReduce 作业，商品表只读一次，推广效果表只读取一次。把 这个 SQL 换成 Map/Reduce 代码的话，Map 的时候，把 a 表的记录打上标签 a，商品表记录 每读取一条，打上标签 b，变成两个<key,value>对，&lt;(b,数字 id),value&gt;，&lt;(b,字符串 id),value&gt;。</key,value></p>
 <p>所以商品表的 HDFS 读取只会是一次。</p>
 <h3 id="解决Hive对UNION-ALL优化的短板"><a href="#解决Hive对UNION-ALL优化的短板" class="headerlink" title="解决Hive对UNION ALL优化的短板"></a>解决Hive对UNION ALL优化的短板</h3><p>Hive 对 union all 的优化的特性：对 union all 优化只局限于非嵌套查询。</p>
 <p>消灭子查询内的 group by</p>
@@ -626,10 +626,10 @@ SELECT * FROM (t1 UNION ALL t4 UNION ALL t5);
 SELECT 20120329 AS thedate,adzoneid,COUNT(DISTINCT acookie) AS uv FROM     s_ods_log_tanx_pv t WHERE t.ds=20120329 GROUP BY adzoneid
 </code></pre><p>关于COUNT(DISTINCT)的数据倾斜问题不能一概而论，要依情况而定，下面是我测试的一组数据：<br>测试数据：169857条</p>
 <pre><code>#统计每日IP 
-CREATE TABLE ip_2014_12_29 AS SELECT COUNT(DISTINCT ip) AS IP FROM logdfs WHERE     logdate=&apos;2014_12_29&apos;; 
+CREATE TABLE ip_2014_12_29 AS SELECT COUNT(DISTINCT ip) AS IP FROM logdfs WHERE     logdate=&#39;2014_12_29&#39;; 
 耗时：24.805 seconds 
 #统计每日IP（改造） 
-CREATE TABLE ip_2014_12_29 AS SELECT COUNT(1) AS IP FROM (SELECT DISTINCT ip from     logdfs WHERE logdate=&apos;2014_12_29&apos;) tmp; 
+CREATE TABLE ip_2014_12_29 AS SELECT COUNT(1) AS IP FROM (SELECT DISTINCT ip from     logdfs WHERE logdate=&#39;2014_12_29&#39;) tmp; 
 耗时：46.833 seconds
 </code></pre><p>测试结果表名：明显改造后的语句比之前耗时，这是因为改造后的语句有2个SELECT，多了一个job，这样在数据量小的时候，数据不会存在倾斜问题。</p>
 <h2 id="优化总结"><a href="#优化总结" class="headerlink" title="优化总结"></a>优化总结</h2><p>优化时，把hive sql当做mapreduce程序来读，会有意想不到的惊喜。理解hadoop的核心能力，是hive优化的根本。这是这一年来，项目组所有成员宝贵的经验总结。</p>
@@ -947,7 +947,7 @@ CREATE TABLE ip_2014_12_29 AS SELECT COUNT(1) AS IP FROM (SELECT DISTINCT ip fro
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">135.7k</span>
+    <span title="Site words total count">135.5k</span>
   
 </div>
 

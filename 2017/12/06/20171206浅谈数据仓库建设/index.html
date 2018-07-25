@@ -115,7 +115,6 @@
 <meta property="og:site_name" content="无所住而生其心">
 <meta property="og:description" content="本文想谈谈数据仓库建模的过程。虽然每个行业有自己的模型，但是，我们发现，不同行业的数据模型，在数据建模的方法上，却都有着共通的基本特点。 本文的主要目的之一，就是希望读者能够通过对本文的阅读，同时，结合自己对数据仓库建设的经验，在建设数据仓库的时候能够总结出一套适合自己的建模方法，能够更好的帮助客户去发挥数据仓库的作用。 本文主要的主线就是回答下面三个问题：  什么是数据模型 为什么需要数据模型">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20171206DW01.JPG">
 <meta property="og:image" content="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20171206DW02.JPG">
 <meta property="og:image" content="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20171206DW03.JPG">
 <meta property="og:image" content="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20171206DW04.JPG">
@@ -127,7 +126,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="浅谈数据仓库建设">
 <meta name="twitter:description" content="本文想谈谈数据仓库建模的过程。虽然每个行业有自己的模型，但是，我们发现，不同行业的数据模型，在数据建模的方法上，却都有着共通的基本特点。 本文的主要目的之一，就是希望读者能够通过对本文的阅读，同时，结合自己对数据仓库建设的经验，在建设数据仓库的时候能够总结出一套适合自己的建模方法，能够更好的帮助客户去发挥数据仓库的作用。 本文主要的主线就是回答下面三个问题：  什么是数据模型 为什么需要数据模型">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20171206DW01.JPG">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20171206DW02.JPG">
 
 
 
@@ -444,7 +443,7 @@
                   <span class="post-meta-item-text">Words count in article&#58;</span>
                 
                 <span title="Words count in article">
-                  7,440 words
+                  7,455 words
                 </span>
               
 
@@ -492,9 +491,22 @@
 </li>
 </ul>
 <p>最后，我们在本文的结尾给大家介绍了一个具体的数据仓库建模的样例，帮助大家来了解整个数据建模的过程。</p>
-<h2 id="什么是数据模型"><a href="#什么是数据模型" class="headerlink" title="什么是数据模型"></a>什么是数据模型</h2><font color="navy"><strong>数据模型是抽象描述现实世界的一种工具和方法，是通过抽象的实体及实体之间联系的形式，来表示现实世界中事务的相互关系的一种映射</strong></font>。在这里，数据模型表现的抽象的是实体和实体之间的关系，通过对实体和实体之间关系的定义和描述，来表达实际的业务中具体的业务关系。<br><br>数据仓库模型是数据模型中针对特定的数据仓库应用系统的一种特定的数据模型，一般的来说，我们数据仓库模型分为几下几个层次，如图所示。<br><br><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20171206DW01.JPG" alt="高山仰止"><br><br>通过上面的图形，我们能够很容易的看出在整个数据仓库得建模过程中，我们需要经历一般四个过程：<br><br><em> 业务建模，生成业务模型，主要解决<strong>业务层面的分解和程序化</strong>。
-</em> 领域建模，生成领域模型，主要是对业务模型进行抽象处理，生成领域概念模型。<br><em> 逻辑建模，生成逻辑模型，主要是将领域模型的概念实体以及实体之间的关系进行数据库层次的逻辑化。
-</em> 物理建模，生成物理模型，主要解决，逻辑模型针对不同关系型数据库的物理化以及性能等一些具体的技术问题。<br><br>因此，在整个数据仓库的模型的设计和架构中，既涉及到业务知识，也涉及到了具体的技术，我们既需要了解丰富的行业经验，同时，也需要一定的信息技术来帮助我们实现我们的数据模型，最重要的是，我们还需要一个非常适用的方法论，来指导我们自己针对我们的业务进行抽象，处理，生成各个阶段的模型。<br><br><font color="navy"></font>
+<h2 id="什么是数据模型"><a href="#什么是数据模型" class="headerlink" title="什么是数据模型"></a>什么是数据模型</h2><font color="navy">**数据模型是抽象描述现实世界的一种工具和方法，是通过抽象的实体及实体之间联系的形式，来表示现实世界中事务的相互关系的一种映射**</font>。在这里，数据模型表现的抽象的是实体和实体之间的关系，通过对实体和实体之间关系的定义和描述，来表达实际的业务中具体的业务关系。
+
+数据仓库模型是数据模型中针对特定的数据仓库应用系统的一种特定的数据模型，一般的来说，我们数据仓库模型分为几下几个层次，如图所示。
+
+![高山仰止](https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20171206DW01.JPG)
+
+通过上面的图形，我们能够很容易的看出在整个数据仓库得建模过程中，我们需要经历一般四个过程：
+
+* 业务建模，生成业务模型，主要解决**业务层面的分解和程序化**。
+* 领域建模，生成领域模型，主要是对业务模型进行抽象处理，生成领域概念模型。
+* 逻辑建模，生成逻辑模型，主要是将领域模型的概念实体以及实体之间的关系进行数据库层次的逻辑化。
+* 物理建模，生成物理模型，主要解决，逻辑模型针对不同关系型数据库的物理化以及性能等一些具体的技术问题。
+
+因此，在整个数据仓库的模型的设计和架构中，既涉及到业务知识，也涉及到了具体的技术，我们既需要了解丰富的行业经验，同时，也需要一定的信息技术来帮助我们实现我们的数据模型，最重要的是，我们还需要一个非常适用的方法论，来指导我们自己针对我们的业务进行抽象，处理，生成各个阶段的模型。
+
+<font color="navy"></font>
 
 <h2 id="为什么需要数据模型"><a href="#为什么需要数据模型" class="headerlink" title="为什么需要数据模型"></a>为什么需要数据模型</h2><p>在数据仓库的建设中，我们一再强调需要数据模型，那么数据模型究竟为什么这么重要呢？首先我们需要了解整个数据仓库的建设的发展史。</p>
 <p>数据仓库的发展大致经历了这样的三个过程：</p>
@@ -917,7 +929,7 @@
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">135.7k</span>
+    <span title="Site words total count">135.5k</span>
   
 </div>
 
