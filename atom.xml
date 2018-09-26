@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-07-14T18:00:24.854Z</updated>
+  <updated>2018-09-25T17:05:45.369Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,57 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Spark与Hadoop哲学概念对比</title>
+    <link href="http://yoursite.com/2018/09/26/20180925Spark%E4%B8%8EHadoop%E5%93%B2%E5%AD%A6%E6%A6%82%E5%BF%B5%E5%AF%B9%E6%AF%94/"/>
+    <id>http://yoursite.com/2018/09/26/20180925Spark与Hadoop哲学概念对比/</id>
+    <published>2018-09-25T17:01:46.000Z</published>
+    <updated>2018-09-25T17:05:45.369Z</updated>
+    
+    <content type="html"><![CDATA[<p>在有迭代计算的领域，Spark 的计算速度远远超过 MapReduce，并且迭代次数越多，Spark 的优势越明显。这是因为 Spark 很好地利用了目前服务器内存越来越大这一优点，通过减少磁盘 I/O 来达到性能提升。它们将中间处理数据全部放到了内存中，仅在必要时才批量存入硬盘中。</p><p>具体来讲，学习任何知识都必须先了解这个知识的历史，才能更深刻的理解。同样的，spark宣称比hadoop快又好，那么后者差在哪里呢？</p><p>hadoop经历过1.0和2.0的时代，所面临的问题一直以来最主要的就是中央集权问题。1.0时代的主要组织架构分为两个部分：</p><h4 id="数据进程"><a href="#数据进程" class="headerlink" title="数据进程"></a>数据进程</h4><p><strong>NameNode 和 DataNode</strong></p><p>NameNode是 HDFS (hadoop file system)的主控服务器。它指挥slave的DataNode守护进程执行低level的IO任务。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">It keeps track of how your files are broken down into file blocks, which nodes store those blocks, and the overall health of the distributed filesystem.</span><br></pre></td></tr></table></figure><p><font color="red">Secondary NameNode 并非NameNode的backup，而是部分承担了NameNode的工作。因此NameNode是单节点的(single point of failure)</font>。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在超大规模hadoop系统中，Namenode往往负载很重，容易失败。因此facebook，cloudera都修改了hadoop架构来减少系统失败几率。</span><br></pre></td></tr></table></figure><p>如果拿户籍管理来比喻的话，namenode就相当于整个hadoop File system的户口簿，有且仅有一份，datanode就是各个区县自治区。如果户口簿丢了，那一切管理工作就都无从谈起了。</p><h4 id="计算进程"><a href="#计算进程" class="headerlink" title="计算进程"></a>计算进程</h4><p><strong>JobTracker 和 TaskTracker </strong></p><p>和用于storage的进程一样，用于计算的进程也使用了master/slave架构。JobTracker负责监控所有的mapreduce job，如果一个task失败了，它负责重启一个。在哪个datanode重启，这个有一定的策略。同时JobTracker还负责集群资源管理，如是否有新节点加入集群，是否有节点离开等等。 </p><p>Each TaskTracker is responsible for executing the individual tasks that the JobTracker assigns. Although there is a single TaskTracker per slave node, each TaskTracker can spawn multiple JVMs to handle many map or reduce tasks in parallel.<br>TaskTracker甚至可以同时执行mapper和reducer</p><p>JobTracker就好比明太祖朱元璋一样，是个劳模，事无巨细的安排好。底下的官员就像TaskTracker一样，虽然它叫tracker，但是实际操作人是它。</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180925sparkhadoop01.png" alt=""></p><p>除了上面的架构上的不足以外，还有一个容易忽略的地方就是1.X版本中，资源利用率是很低的。Tasktracker使用slot划分本节点上的资源量。一个Task在获得slot之后才可以运行。slot分为mapSlot和reduceSlot，分别对应mapTask和reduceTask。有时候会因为作业刚启动的时候，导致MapTask很多，而reduceTask没有调度的情况，而别的线程也无法使用空闲的reduceSlot资源。</p><p>如果说2.0有什么创新的话，我觉得在于改良而不在于革命，它依旧突破不了那一套旧的根本，如果不是将各个模块剥离， 同时将控制权交出去 ，以高效运算为中心，那这套系统早就已经被淘汰了。新的框架架构如下：</p><p>1、通过YARN实现资源的调度与管理，从而使Hadoop 2.0可以运行更多种类的计算框架，如Spark等。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">以前是只能自己写MR接口使用，现在心胸更开阔一点了，不open不行，大家不用了就不好了。</span><br></pre></td></tr></table></figure><p>2、实现了NameNode的HA方案，即同时有2个NameNode（一个Active另一个Standby），如果ActiveNameNode挂掉的话，另一个NameNode会转入Active状态提供服务，保证了整个集群的高可用。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">实在想不出1.0不备份namenode是为什么</span><br></pre></td></tr></table></figure><p>3、实现了HDFS federation，由于元数据放在NameNode的内存当中，内存限制了整个集群的规模，通过HDFS federation使多个NameNode组成一个联邦共同管理DataNode，这样就可以扩大集群规模。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">通过namenode的扩展，实现了整个集群的规模扩展</span><br></pre></td></tr></table></figure><p>4、Hadoop RPC序列化扩展性好，通过将数据类型模块从RPC中独立出来，成为一个独立的可插拔模块。</p><h4 id="Yarn"><a href="#Yarn" class="headerlink" title="Yarn"></a>Yarn</h4><p>纵观说来，yarn的发明是2.0最具颠覆性的功能，它是一个通用的资源管理系统，可为上层应用提供统一的资源管理和调度，它的引入为集群在利用率、资源统一管理和数据共享等方面带来了巨大好处。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">总结来说，yarn对计算进程端进行了大刀阔斧的改革，而数据进程则仅仅进行了HA</span><br></pre></td></tr></table></figure><p>那么Yarn的设计哲学是什么呢？</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180925sparkhadoop02.png" alt=""></p><p><font color="red"><strong>YARN的基本设计思想是将Hadoop 1.0中的JobTracker拆分成了两个独立的服务</strong></font>：一个全局的资源管理器ResourceManager和每个应用程序特有的ApplicationMaster。其中ResourceManager负责整个系统的资源管理和分配，而ApplicationMaster负责单个应用程序的管理。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">这种模式的核心思想也是放权，从JobTracker的事无巨细，到转变为ResourceManager，同时扶持多个ApplicationMaster向ResourceManager汇报。</span><br><span class="line"></span><br><span class="line">肯定也会有人有疑问，ResourceManager也会出现单点问题啊。放心，同一次亏不会吃两次的，它也有HA。</span><br></pre></td></tr></table></figure><p>Hadoop两代版本的比较就到此为止，各个组件内部是如何工作的我们暂且不表。未来可以细分讨论一下。接下来想说的是spark这个具有革命性的东西。为什么前文说Hadoop并没有真正的进行革命，因为它想用它自己的那一套MR的方式，维护着统治，纵然有了分权等先进制度，但是无异于洋务运动，治标不治本。</p><p>Spark的优化如下：</p><h4 id="减少磁盘IO"><a href="#减少磁盘IO" class="headerlink" title="减少磁盘IO"></a>减少磁盘IO</h4><p>这个不用废话，两个流程图就可以明白。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MRv1: map =&gt; 磁盘  =&gt; reduce =&gt; 磁盘</span><br><span class="line">Spark: map =&gt; reduce =&gt; 磁盘</span><br></pre></td></tr></table></figure><h4 id="增加并行度"><a href="#增加并行度" class="headerlink" title="增加并行度"></a>增加并行度</h4><p>这个涉及到RDD的宽依赖和窄依赖，不同的依赖可以分为不同的stage，stage之间可以串并联运行。串并的程度取决于系统的资源。</p><h4 id="避免重复计算"><a href="#避免重复计算" class="headerlink" title="避免重复计算"></a>避免重复计算</h4><p>得益于RDD的DAG设计以及checkpoint和cache，重启失败job的时候可以避免重复计算。</p><h4 id="可选shuffle排序"><a href="#可选shuffle排序" class="headerlink" title="可选shuffle排序"></a>可选shuffle排序</h4><p>Hadoop的MR在shuffle之前有着固定的排序操作。在spark中可以自己选择在map端排序还是在reduce端排序。</p><h4 id="灵活高端的内存管理策略"><a href="#灵活高端的内存管理策略" class="headerlink" title="灵活高端的内存管理策略"></a>灵活高端的内存管理策略</h4><p>spark由于是基于内存的，所以内存管理的策略就尤为重要。这里不做赘述后面可以深入研究一下。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;在有迭代计算的领域，Spark 的计算速度远远超过 MapReduce，并且迭代次数越多，Spark 的优势越明显。这是因为 Spark 很好地利用了目前服务器内存越来越大这一优点，通过减少磁盘 I/O 来达到性能提升。它们将中间处理数据全部放到了内存中，仅在必要时才批量存
+      
+    
+    </summary>
+    
+      <category term="Coding" scheme="http://yoursite.com/categories/Coding/"/>
+    
+    
+      <category term="Spark" scheme="http://yoursite.com/tags/Spark/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spark基本概念哲学剖析</title>
+    <link href="http://yoursite.com/2018/09/26/20180925Spark%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%93%B2%E5%AD%A6%E5%89%96%E6%9E%90/"/>
+    <id>http://yoursite.com/2018/09/26/20180925Spark基本概念哲学剖析/</id>
+    <published>2018-09-25T16:55:14.000Z</published>
+    <updated>2018-09-25T17:06:36.629Z</updated>
+    
+    <content type="html"><![CDATA[<h4 id="Spark框架基本概念"><a href="#Spark框架基本概念" class="headerlink" title="Spark框架基本概念"></a>Spark框架基本概念</h4><p>所谓的Spark框架基本概念都是围绕着RDD衍生出来的：</p><ul><li>DAG： 用有向无环图来表示RDD之间的血缘关系</li><li>Partition： RDD的分区数，Spark根据partition的数量确定task的数量</li><li>窄依赖： 子RDD依赖父RDD的固定partition</li><li>宽依赖： 子RDD对父RDD所有的partition都有可能依赖</li><li>JOB：用户提交的作业，当RDD以及其DAG被提交到DAGScheduler调度后，后者将所有的RDD的transformation和action视为一个JOB</li><li>Stage：这个是job执行时候的概念，根据宽窄依赖来区分</li><li>Task：每个job在每个stage内，都会按照RDD的Partition的数量创建多个Task。一个rdd分成几个partition，则有几个task</li><li>Shuffle：所有MR框架的核心执行阶段，用来连接map和reduce。</li></ul><h4 id="spark设计思想"><a href="#spark设计思想" class="headerlink" title="spark设计思想"></a>spark设计思想</h4><p>前文也说过，Hadoop2.X并没有对自己底层mr框架的难用有任何反思，所以spark并没有继承这一坑，转而自开发了一套针对RDD转化和执行的API。这就使得spark的使用极其丰富了。下面我们聊聊spark的设计逻辑哲学思想。</p><p>一个完整的组织，需要有明晰的结构划分，才能发挥最大的作用，Spark也不能例外。历史上那些没有高度统一的，层级分明的框架都已经被淘汰了。同样的，一个组织架构要有自己的使命，才能清楚的知道自己该做什么，能做什么，如何做好。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Apache Spark™ is a unified analytics engine for large-scale data processing</span><br></pre></td></tr></table></figure><p>官网上已经为其理清了血统，作为一个统一的大规模数据处理分析引擎，我们可以知道，它的核心功能一定分为以下几个部分。</p><h5 id="基础设施"><a href="#基础设施" class="headerlink" title="基础设施"></a>基础设施</h5><p>基础设施顾名思义，乃是Spark整个基石的基础，包括sparkConf，内置RPC（以前使用Actor，后来用Netty自己实现了），事件总线，度量系统。</p><p>为什么这些组成了Basic Instructure，可以想象一下，SparkConf就相当于一张饭票一样，里面记录了一个spark JOB所需要的各种资源清单，包括不局限于CPU，内核数等等，没有这张清单，你就无法获得资源，运行就无从谈起了。</p><p>RPC（Remote Procedure Call），这个不用多讲了，Spark基于Hadoop的存储架构，可以支持分布式的大规模运算，没有RPC的话，集群间的通信就无法实现，可以说这个是spark大规模计算实现的基础，单机你才多点儿数据。</p><p>事件总线，RPC可以理解为不同机器间的通信设施，而时间总线可以理解为SparkContext内部各个组件使用事件监听模式。或者可以粗暴的理解为一个线程调度系统，具体想要深入的了解事件总线，推荐到<a href="https://www.cnblogs.com/sheng-jie/p/6970091.html" target="_blank" rel="noopener">这个地方</a>进行仔细的参考。也就是说，它是spark内部能够有条不紊运行的基础。</p><p>度量系统，这个对大家来说比较陌生，但是它也十分重要（既然被放到了基础设施中）。但是它却是一个实实在在的监控系统。</p><p>它大概分成了一下几个模块：</p><ul><li><p>Instance：指定了度量系统的实例名。Spark按照Instance的不同，区分为Master、Worker、Application、Driver和Executor；</p></li><li><p>Source：指定了从哪里收集度量数据，即度量数据的来源。Spark提供了应用的度量来源（ApplicationSource）、Worker的度量来源（WorkerSource）、DAGScheduler的度量来源（DAGSchedulerSource）、BlockManager的度量来源（BlockManagerSource）等诸多实现，对各个服务或组件进行监控。</p></li><li><p>Sink：指定了往哪里输出度量数据，即度量数据的输出。Spark中使用MetricsServlet作为默认的Sink，此外还提供了ConsoleSink、CsvSink、JmxSink、MetricsServlet、GraphiteSink等实现。</p></li></ul><p>那么基于此，就能够知道，spark那些比较精细的统计数据，是基于什么实现的了。</p><p>以上几个部分，就是spark基础设施的全部内容，涵盖了通信、资源配置、系统级别的监控。可以感受的到，这些基础设施之所以称之为都是spark内部的架构。</p><h5 id="SparkContext"><a href="#SparkContext" class="headerlink" title="SparkContext"></a>SparkContext</h5><p>Context是上下文的意思，那么sparkContext顾名思义就是spark上下文，可以说它包罗万象，不仅仅有我们上面提到的基础设施，还包括了外部的存储体系，文件系统，等等。开发者仅仅需要使用sparkContext提供的API即可完成功能开发。它是一个总的环境池，就像一条大河的源头一样，一切都从这里发生。</p><h5 id="SparkEnv"><a href="#SparkEnv" class="headerlink" title="SparkEnv"></a>SparkEnv</h5><p>Env是运行时环境，它包含了task所要运行的各种组件</p><h5 id="储存体系"><a href="#储存体系" class="headerlink" title="储存体系"></a>储存体系</h5><p>spark优于hadoop就是得利于它的存储设计，这个已经老生常谈， 这里就不扩展开讲述。</p><h5 id="调度系统"><a href="#调度系统" class="headerlink" title="调度系统"></a>调度系统</h5><p>调度系统要和刚刚的度量系统区分开来，后者是用于内部数据流程的精细监控。而前者主要分DAGScheduler和TaskScheduler，这两个Schedulor也是在SparkConf中。两者也有不同的分工，从级别上来讲，他俩还不负责实操，DAG感觉就像产品经理，不断地给Task提需求（创建job，划分stage、给stage创建task），同时这个需求还不能总提，你得控制节奏，所以要批量提交task。TaskScheduler也不是省油灯，它也不干活 ，它只是负责指挥调度Excutor，真正的实操是在Excutor上面。</p><h5 id="计算引擎"><a href="#计算引擎" class="headerlink" title="计算引擎"></a>计算引擎</h5><p>整个计算引擎，除了我们了解的最普遍的MR以外，还涉及到了比较精细粒度的内存管理和执行控制，这里具体不表，可以单独深入的了解一下。</p><p>以上就是spark大体框架的一个比较哲学的分析。后三部分是我们基于直观感受能够想到的，而前三个部分正是基础中的基础。</p><h4 id="Spark的物理架构"><a href="#Spark的物理架构" class="headerlink" title="Spark的物理架构"></a>Spark的物理架构</h4><p>以上我们以手术刀般精准的角度去剖析了spark体系的边边角角，但是对spark的计算流程谈的不甚详细，同时上面提到的这些架构，分布在机器的哪些位置，还不清楚。所以再花一点篇幅，写一下我自己对计算流程的理解和对物理架构的介绍。</p><p>生活中办事儿，需要中间人、老司机。那spark在提交作业的时候，也不是想交就能交的上去的，也得有老司机带路。这个老司机就是driver，那driver干了些啥呢？当我们的应用程序将代码提交给她后，它大概有以下几件事情要做：</p><ul><li>RpcEnv向集群管理器（Cluster Manager）注册应用（也就是你写的Application，跟挂号是一个道理，你不在Cluster Manager注册，集群是不会知道要运行你这个程序的）</li><li>并且注册后，我们的集群管理员会根据你的提交清单（也就是你sparkconf记录的东西）来分配资源</li><li>并且在worker上启动CoarseGrainedExecutorBackend进程（这么一大串太装逼了，你就知道它用来创建executor即可）。要注意，这个启动的过程是一个双向反馈的过程，它会直接通过RpcEnv向老司机注册已经申请到的Executor的信息，这样老司机才能有办法跟我们交差，不然我们岂不是白白委托它了。</li><li>同时，下游的TaskScheduler也会记录这些Executor的信息，它的角色就相当于包工头一样，当然要记录组织分配下来的劳力。</li><li>SparkContext，前文说过了，母亲河，会将RDD的各种转换关系构建成为DAG，然后DAG会被传给DAGScheduler。</li><li>后者把它划分为不同的stage，然后根据每个stage内的RDD的Partition数量创建Task，批量提交给TaskScheduler。</li><li>包工头对批量的Task进行指挥，指挥方式有FIFO或者FAIR，按既定方针送给底层民工Executor执行。</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SparkContext在RDD转换开始之前，使用BlockManager和BroadcastManager将任务的Hadoop配置进行广播。这样就确保了每台机器都能够按既定方针办事</span><br></pre></td></tr></table></figure><p>上述过程形在流程，而实有三个，Driver，SparkContext，Cluster Manager。而我们对第三者关注的并不是太多，实际上它是我们熟悉的面孔，常用的管理者就是——Yarn。它是Driver和Worker节点连接者。而Worker节点，就是民工所在地，为了民工好干活，Store存储也在Worker上，即：</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180925Spark.png" alt=""></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h4 id=&quot;Spark框架基本概念&quot;&gt;&lt;a href=&quot;#Spark框架基本概念&quot; class=&quot;headerlink&quot; title=&quot;Spark框架基本概念&quot;&gt;&lt;/a&gt;Spark框架基本概念&lt;/h4&gt;&lt;p&gt;所谓的Spark框架基本概念都是围绕着RDD衍生出来的：&lt;/p&gt;
+&lt;
+      
+    
+    </summary>
+    
+      <category term="Coding" scheme="http://yoursite.com/categories/Coding/"/>
+    
+    
+      <category term="Spark" scheme="http://yoursite.com/tags/Spark/"/>
+    
+  </entry>
   
   <entry>
     <title>真正意义上的货币战争</title>
@@ -472,62 +523,6 @@
     
     
       <category term="Investment" scheme="http://yoursite.com/tags/Investment/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spring Boot始于足下</title>
-    <link href="http://yoursite.com/2018/03/15/20180315SpringBoot%E5%A7%8B%E4%BA%8E%E8%B6%B3%E4%B8%8B/"/>
-    <id>http://yoursite.com/2018/03/15/20180315SpringBoot始于足下/</id>
-    <published>2018-03-15T09:00:59.000Z</published>
-    <updated>2018-07-06T17:24:34.159Z</updated>
-    
-    <content type="html"><![CDATA[<p>以前我们做Spring的时候，无论项目大小，都要经历以下过程：</p><ul><li>配置web.xml，加载spring和spring mvc</li><li>配置数据库连接、配置spring事务</li><li>配置加载配置文件的读取，开启注解</li><li>配置日志文件</li></ul><p>…</p><p>配置完成之后部署tomcat 调试</p><p>…</p><p>无论项目大小，我们都要经历上面复杂的项目流程。</p><p>那么我们用了Spring Boot的时候，情况就会改善很多。Spring的入门可以根据IBM和</p><p>老生常谈的MVC，温故知新：</p><p>view：视图。这个很容易理解，其实view层就是用户用户可以看到的东西。后台怎么处理不关心，只关心怎么样想用户展示信息。</p><p> controller：也可以成为action层，业务模块流程。我经常喜欢用控制视图的跳转来简单形容，但是这个是不全面的，因为他除了控制视图的转换之外，还控制了业务的逻辑，但是，这里的控制业务逻辑不是业务逻辑的实现，而仅仅是一个大的模块，你看到之后，知道它实现了这个业务逻辑，但是怎么实现的，不需要关心，仅仅需要调用service层里的一个方法即可，这样使controller层看起来更加清晰。</p><p>service：业务逻辑层。接着controller层中，可以想到，service层是业务逻辑（商务逻辑）的具体实现。它向上层的controller层提供接口，并且使用dao层提供的接口。存在的必要性：有时候，我认为更多的时刻，service层中仅仅是调用dao层中的一个方法，那么它是否有必要存在呢？答案是肯定的。因为，假如将来客户的业务有一定的变动，那么这样一来，你只需要在service层中进行一些变动即可。记住，你写程序不应该仅仅为实现功能考虑，更多的还是应该为将来的维护考虑，因为大部分的时间还是在维护上的。</p><p>dao：数据访问对象。也就是我们经常说的数据持久层，负责与数据库进行联络的一些任务都封装在此，DAO层的设计首先是设计DAO的接口，然后在Spring的配置文件中定义此接口的实现类，然后就可在模块中调用此接口来进行数据业务的处理，而不用关心此接口的具体实现类是哪个类，显得结构非常清晰，DAO层的数据源配置，以及有关数据库连接的参数都在Spring的配置文件中进行配置。 </p><p><code>这些层次的理解还需要结合实际开发后来感受一下</code></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;以前我们做Spring的时候，无论项目大小，都要经历以下过程：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;配置web.xml，加载spring和spring mvc&lt;/li&gt;
-&lt;li&gt;配置数据库连接、配置spring事务&lt;/li&gt;
-&lt;li&gt;配置加载配置文件的读取，开启注解&lt;/li&gt;
-&lt;li
-      
-    
-    </summary>
-    
-      <category term="Coding" scheme="http://yoursite.com/categories/Coding/"/>
-    
-    
-      <category term="Spring" scheme="http://yoursite.com/tags/Spring/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>梯度下降算法的三种形式：BGD, SGD, MBGD</title>
-    <link href="http://yoursite.com/2018/03/13/20180313%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E7%AE%97%E6%B3%95%E7%9A%84%E4%B8%89%E7%A7%8D%E5%BD%A2%E5%BC%8F%EF%BC%9ABGD%EF%BC%8CSGD-MBGD/"/>
-    <id>http://yoursite.com/2018/03/13/20180313梯度下降算法的三种形式：BGD，SGD-MBGD/</id>
-    <published>2018-03-13T07:27:10.000Z</published>
-    <updated>2018-07-06T17:24:34.159Z</updated>
-    
-    <content type="html"><![CDATA[<p>在求解机器学习算法的模型参数，即无约束优化问题时，梯度下降（Gradient Descent）是最常采用的方法之一，另一种常用的方法是最小二乘法。这里就对梯度下降法做一个完整的总结。</p><h4 id="BGD-批量梯度下降算法"><a href="#BGD-批量梯度下降算法" class="headerlink" title="BGD 批量梯度下降算法"></a>BGD 批量梯度下降算法</h4><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313gradient01.jpg" alt="高山仰止"></p><p>首先来看看梯度下降的一个直观的解释。比如我们在一座大山上的某处位置，由于我们不知道怎么下山，于是决定走一步算一步，也就是在每走到一个位置的时候，求解当前位置的梯度，沿着梯度的负方向，也就是当前最陡峭的位置向下走一步，然后继续求解当前位置梯度，向这一步所在位置沿着最陡峭最易下山的位置走一步。这样一步步的走下去，一直走到觉得我们已经到了山脚。当然这样走下去，有可能我们不能走到山脚，而是到了某一个局部的山峰低处。</p><p>从上面的解释可以看出，梯度下降不一定能够找到全局的最优解，有可能是一个局部最优解。当然，如果损失函数是凸函数，梯度下降法得到的解就一定是全局最优解。</p><h5 id="梯度下降的相关概念"><a href="#梯度下降的相关概念" class="headerlink" title="梯度下降的相关概念"></a>梯度下降的相关概念</h5><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313gradient02.jpg" alt="高山仰止"></p><p>算法的具体过程可以见下图：</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313gradient03.jpg" alt="高山仰止"></p><p>BGD最关键的地方在于理解，为什么梯度参数更新的时候用原参数 - 损失函数关于参数的偏导数。因为函数关于某一点的导数的意义在于这一点的变化率，那么关于参数的导数就是参数的变化率，而乘以步长的意义在于参数变化了多少。</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313gradient04.jpg" alt="高山仰止"></p><p>那么我们可以看到，每更新一次参数就要用到所有的训练数据，这样的话是非常耗时的。</p><h4 id="SGD-Stochastic-Gradient-Descent-随机梯度下降算法"><a href="#SGD-Stochastic-Gradient-Descent-随机梯度下降算法" class="headerlink" title="SGD Stochastic Gradient Descent 随机梯度下降算法"></a>SGD Stochastic Gradient Descent 随机梯度下降算法</h4><p>由于批梯度下降每跟新一个参数的时候，要用到所有的样本数，所以训练速度会随着样本数量的增加而变得非常缓慢。随机梯度下降正是为了解决这个办法而提出的。它是利用每个样本的损失函数对θ求偏导得到对应的梯度，来更新θ：</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313gradient05.jpg" alt="高山仰止"></p><p>也就是说在SGD中，算法不再考虑每个样本的意见了，而是见好就收，针对当前样本进行上文所述的修正。显而易见的，这种方法在速度上取得了绝对的优势，但是在收敛性上显得过于随意。随机梯度下降是通过每个样本来迭代更新一次，对比上面的批量梯度下降，迭代一次需要用到所有训练样本（往往如今真实问题训练数据都是非常巨大），一次迭代不可能最优，如果迭代10次的话就需要遍历训练样本10次。但是，SGD伴随的一个问题是噪音较BGD要多，使得SGD并不是每次迭代都向着整体最优化方向。</p><h4 id="MBGD-Mini-batch-Gradient-Descent"><a href="#MBGD-Mini-batch-Gradient-Descent" class="headerlink" title="MBGD Mini-batch Gradient Descent"></a>MBGD Mini-batch Gradient Descent</h4><p>上面两种算法各有优缺点，而MBGD就是中和了上面两种方法的，也就是说我们更新参数的时候，能够自己选择使用样本的个数</p><p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180313gradient06.jpg" alt="高山仰止"></p><h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ol><li><p>批梯度下降每次更新使用了所有的训练数据，最小化损失函数，如果只有一个极小值，那么批梯度下降是考虑了训练集所有数据，是朝着最小值迭代运动的，但是缺点是如果样本值很大的话，更新速度会很慢。</p></li><li><p>随机梯度下降在每次更新的时候，只考虑了一个样本点，这样会大大加快训练数据，也恰好是批梯度下降的缺点，但是有可能由于训练数据的噪声点较多，那么每一次利用噪声点进行更新的过程中，就不一定是朝着极小值方向更新，但是由于更新多轮，整体方向还是大致朝着极小值方向更新，又提高了速度。</p></li><li><p>小批量梯度下降法是为了解决批梯度下降法的训练速度慢，以及随机梯度下降法的准确性综合而来，但是这里注意，不同问题的batch是不一样的，听师兄跟我说，我们nlp的parser训练部分batch一般就设置为10000，那么为什么是10000呢，我觉得这就和每一个问题中神经网络需要设置多少层，没有一个人能够准确答出，只能通过实验结果来进行超参数的调整。</p></li></ol><p><a href="https://zhuanlan.zhihu.com/p/25765735" target="_blank" rel="noopener">参考此文</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;在求解机器学习算法的模型参数，即无约束优化问题时，梯度下降（Gradient Descent）是最常采用的方法之一，另一种常用的方法是最小二乘法。这里就对梯度下降法做一个完整的总结。&lt;/p&gt;
-&lt;h4 id=&quot;BGD-批量梯度下降算法&quot;&gt;&lt;a href=&quot;#BGD-批量梯度下
-      
-    
-    </summary>
-    
-      <category term="Machine Learning" scheme="http://yoursite.com/categories/Machine-Learning/"/>
-    
-    
-      <category term="Algorithm" scheme="http://yoursite.com/tags/Algorithm/"/>
     
   </entry>
   

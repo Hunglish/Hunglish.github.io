@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+
+<script>
+    (function(){
+        if(''){
+            if (prompt('嚼得菜根:') !== ''){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+</script>
+
+
+
+<meta name="baidu-site-verification" content="PNxFZ4OXUk" />
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="true" />
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="true" />
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spark," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="无所住而生其心" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="Spark框架基本概念所谓的Spark框架基本概念都是围绕着RDD衍生出来的：  DAG： 用有向无环图来表示RDD之间的血缘关系 Partition： RDD的分区数，Spark根据partition的数量确定task的数量 窄依赖： 子RDD依赖父RDD的固定partition 宽依赖： 子RDD对父RDD所有的partition都有可能依赖 JOB：用户提交的作业，当RDD以及其DAG被提交">
+<meta name="keywords" content="Spark">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark基本概念哲学剖析">
+<meta property="og:url" content="http://yoursite.com/2018/09/26/20180925Spark基本概念哲学剖析/index.html">
+<meta property="og:site_name" content="无所住而生其心">
+<meta property="og:description" content="Spark框架基本概念所谓的Spark框架基本概念都是围绕着RDD衍生出来的：  DAG： 用有向无环图来表示RDD之间的血缘关系 Partition： RDD的分区数，Spark根据partition的数量确定task的数量 窄依赖： 子RDD依赖父RDD的固定partition 宽依赖： 子RDD对父RDD所有的partition都有可能依赖 JOB：用户提交的作业，当RDD以及其DAG被提交">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180925Spark.png">
+<meta property="og:updated_time" content="2018-09-25T17:06:36.629Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spark基本概念哲学剖析">
+<meta name="twitter:description" content="Spark框架基本概念所谓的Spark框架基本概念都是围绕着RDD衍生出来的：  DAG： 用有向无环图来表示RDD之间的血缘关系 Partition： RDD的分区数，Spark根据partition的数量确定task的数量 窄依赖： 子RDD依赖父RDD的固定partition 宽依赖： 子RDD对父RDD所有的partition都有可能依赖 JOB：用户提交的作业，当RDD以及其DAG被提交">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180925Spark.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '65HI0VE2NP',
+      apiKey: '6c2ac0dc2715b507fd4b7a708d88d7f5',
+      indexName: 'MyBlog',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/09/26/20180925Spark基本概念哲学剖析/"/>
+
+
+
+
+
+  <title>Spark基本概念哲学剖析 | 无所住而生其心</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">无所住而生其心</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/26/20180925Spark基本概念哲学剖析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="余洋">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/author.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="无所住而生其心">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spark基本概念哲学剖析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-09-26T00:55:14+08:00">
+                2018-09-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Coding/" itemprop="url" rel="index">
+                    <span itemprop="name">Coding</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/09/26/20180925Spark基本概念哲学剖析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/09/26/20180925Spark基本概念哲学剖析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/09/26/20180925Spark基本概念哲学剖析/" class="leancloud_visitors" data-flag-title="Spark基本概念哲学剖析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Heat&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+                  <span>℃ </span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Words count in article&#58;</span>
+                
+                <span title="Words count in article">
+                  2,135 words
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Reading time &asymp;</span>
+                
+                <span title="Reading time">
+                  8 min
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="Spark框架基本概念"><a href="#Spark框架基本概念" class="headerlink" title="Spark框架基本概念"></a>Spark框架基本概念</h4><p>所谓的Spark框架基本概念都是围绕着RDD衍生出来的：</p>
+<ul>
+<li>DAG： 用有向无环图来表示RDD之间的血缘关系</li>
+<li>Partition： RDD的分区数，Spark根据partition的数量确定task的数量</li>
+<li>窄依赖： 子RDD依赖父RDD的固定partition</li>
+<li>宽依赖： 子RDD对父RDD所有的partition都有可能依赖</li>
+<li>JOB：用户提交的作业，当RDD以及其DAG被提交到DAGScheduler调度后，后者将所有的RDD的transformation和action视为一个JOB</li>
+<li>Stage：这个是job执行时候的概念，根据宽窄依赖来区分</li>
+<li>Task：每个job在每个stage内，都会按照RDD的Partition的数量创建多个Task。一个rdd分成几个partition，则有几个task</li>
+<li>Shuffle：所有MR框架的核心执行阶段，用来连接map和reduce。</li>
+</ul>
+<h4 id="spark设计思想"><a href="#spark设计思想" class="headerlink" title="spark设计思想"></a>spark设计思想</h4><p>前文也说过，Hadoop2.X并没有对自己底层mr框架的难用有任何反思，所以spark并没有继承这一坑，转而自开发了一套针对RDD转化和执行的API。这就使得spark的使用极其丰富了。下面我们聊聊spark的设计逻辑哲学思想。</p>
+<p>一个完整的组织，需要有明晰的结构划分，才能发挥最大的作用，Spark也不能例外。历史上那些没有高度统一的，层级分明的框架都已经被淘汰了。同样的，一个组织架构要有自己的使命，才能清楚的知道自己该做什么，能做什么，如何做好。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Apache Spark™ is a unified analytics engine for large-scale data processing</span><br></pre></td></tr></table></figure>
+<p>官网上已经为其理清了血统，作为一个统一的大规模数据处理分析引擎，我们可以知道，它的核心功能一定分为以下几个部分。</p>
+<h5 id="基础设施"><a href="#基础设施" class="headerlink" title="基础设施"></a>基础设施</h5><p>基础设施顾名思义，乃是Spark整个基石的基础，包括sparkConf，内置RPC（以前使用Actor，后来用Netty自己实现了），事件总线，度量系统。</p>
+<p>为什么这些组成了Basic Instructure，可以想象一下，SparkConf就相当于一张饭票一样，里面记录了一个spark JOB所需要的各种资源清单，包括不局限于CPU，内核数等等，没有这张清单，你就无法获得资源，运行就无从谈起了。</p>
+<p>RPC（Remote Procedure Call），这个不用多讲了，Spark基于Hadoop的存储架构，可以支持分布式的大规模运算，没有RPC的话，集群间的通信就无法实现，可以说这个是spark大规模计算实现的基础，单机你才多点儿数据。</p>
+<p>事件总线，RPC可以理解为不同机器间的通信设施，而时间总线可以理解为SparkContext内部各个组件使用事件监听模式。或者可以粗暴的理解为一个线程调度系统，具体想要深入的了解事件总线，推荐到<a href="https://www.cnblogs.com/sheng-jie/p/6970091.html" target="_blank" rel="noopener">这个地方</a>进行仔细的参考。也就是说，它是spark内部能够有条不紊运行的基础。</p>
+<p>度量系统，这个对大家来说比较陌生，但是它也十分重要（既然被放到了基础设施中）。但是它却是一个实实在在的监控系统。</p>
+<p>它大概分成了一下几个模块：</p>
+<ul>
+<li><p>Instance：指定了度量系统的实例名。Spark按照Instance的不同，区分为Master、Worker、Application、Driver和Executor；</p>
+</li>
+<li><p>Source：指定了从哪里收集度量数据，即度量数据的来源。Spark提供了应用的度量来源（ApplicationSource）、Worker的度量来源（WorkerSource）、DAGScheduler的度量来源（DAGSchedulerSource）、BlockManager的度量来源（BlockManagerSource）等诸多实现，对各个服务或组件进行监控。</p>
+</li>
+<li><p>Sink：指定了往哪里输出度量数据，即度量数据的输出。Spark中使用MetricsServlet作为默认的Sink，此外还提供了ConsoleSink、CsvSink、JmxSink、MetricsServlet、GraphiteSink等实现。</p>
+</li>
+</ul>
+<p>那么基于此，就能够知道，spark那些比较精细的统计数据，是基于什么实现的了。</p>
+<p>以上几个部分，就是spark基础设施的全部内容，涵盖了通信、资源配置、系统级别的监控。可以感受的到，这些基础设施之所以称之为都是spark内部的架构。</p>
+<h5 id="SparkContext"><a href="#SparkContext" class="headerlink" title="SparkContext"></a>SparkContext</h5><p>Context是上下文的意思，那么sparkContext顾名思义就是spark上下文，可以说它包罗万象，不仅仅有我们上面提到的基础设施，还包括了外部的存储体系，文件系统，等等。开发者仅仅需要使用sparkContext提供的API即可完成功能开发。它是一个总的环境池，就像一条大河的源头一样，一切都从这里发生。</p>
+<h5 id="SparkEnv"><a href="#SparkEnv" class="headerlink" title="SparkEnv"></a>SparkEnv</h5><p>Env是运行时环境，它包含了task所要运行的各种组件</p>
+<h5 id="储存体系"><a href="#储存体系" class="headerlink" title="储存体系"></a>储存体系</h5><p>spark优于hadoop就是得利于它的存储设计，这个已经老生常谈， 这里就不扩展开讲述。</p>
+<h5 id="调度系统"><a href="#调度系统" class="headerlink" title="调度系统"></a>调度系统</h5><p>调度系统要和刚刚的度量系统区分开来，后者是用于内部数据流程的精细监控。而前者主要分DAGScheduler和TaskScheduler，这两个Schedulor也是在SparkConf中。两者也有不同的分工，从级别上来讲，他俩还不负责实操，DAG感觉就像产品经理，不断地给Task提需求（创建job，划分stage、给stage创建task），同时这个需求还不能总提，你得控制节奏，所以要批量提交task。TaskScheduler也不是省油灯，它也不干活 ，它只是负责指挥调度Excutor，真正的实操是在Excutor上面。</p>
+<h5 id="计算引擎"><a href="#计算引擎" class="headerlink" title="计算引擎"></a>计算引擎</h5><p>整个计算引擎，除了我们了解的最普遍的MR以外，还涉及到了比较精细粒度的内存管理和执行控制，这里具体不表，可以单独深入的了解一下。</p>
+<p>以上就是spark大体框架的一个比较哲学的分析。后三部分是我们基于直观感受能够想到的，而前三个部分正是基础中的基础。</p>
+<h4 id="Spark的物理架构"><a href="#Spark的物理架构" class="headerlink" title="Spark的物理架构"></a>Spark的物理架构</h4><p>以上我们以手术刀般精准的角度去剖析了spark体系的边边角角，但是对spark的计算流程谈的不甚详细，同时上面提到的这些架构，分布在机器的哪些位置，还不清楚。所以再花一点篇幅，写一下我自己对计算流程的理解和对物理架构的介绍。</p>
+<p>生活中办事儿，需要中间人、老司机。那spark在提交作业的时候，也不是想交就能交的上去的，也得有老司机带路。这个老司机就是driver，那driver干了些啥呢？当我们的应用程序将代码提交给她后，它大概有以下几件事情要做：</p>
+<ul>
+<li>RpcEnv向集群管理器（Cluster Manager）注册应用（也就是你写的Application，跟挂号是一个道理，你不在Cluster Manager注册，集群是不会知道要运行你这个程序的）</li>
+<li>并且注册后，我们的集群管理员会根据你的提交清单（也就是你sparkconf记录的东西）来分配资源</li>
+<li>并且在worker上启动CoarseGrainedExecutorBackend进程（这么一大串太装逼了，你就知道它用来创建executor即可）。要注意，这个启动的过程是一个双向反馈的过程，它会直接通过RpcEnv向老司机注册已经申请到的Executor的信息，这样老司机才能有办法跟我们交差，不然我们岂不是白白委托它了。</li>
+<li>同时，下游的TaskScheduler也会记录这些Executor的信息，它的角色就相当于包工头一样，当然要记录组织分配下来的劳力。</li>
+<li>SparkContext，前文说过了，母亲河，会将RDD的各种转换关系构建成为DAG，然后DAG会被传给DAGScheduler。</li>
+<li>后者把它划分为不同的stage，然后根据每个stage内的RDD的Partition数量创建Task，批量提交给TaskScheduler。</li>
+<li>包工头对批量的Task进行指挥，指挥方式有FIFO或者FAIR，按既定方针送给底层民工Executor执行。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SparkContext在RDD转换开始之前，使用BlockManager和BroadcastManager将任务的Hadoop配置进行广播。这样就确保了每台机器都能够按既定方针办事</span><br></pre></td></tr></table></figure>
+<p>上述过程形在流程，而实有三个，Driver，SparkContext，Cluster Manager。而我们对第三者关注的并不是太多，实际上它是我们熟悉的面孔，常用的管理者就是——Yarn。它是Driver和Worker节点连接者。而Worker节点，就是民工所在地，为了民工好干活，Store存储也在Worker上，即：</p>
+<p><img src="https://raw.githubusercontent.com/Hunglish/Blog-Photos/master/picture/20180925Spark.png" alt=""></p>
+
+      
+    </div>
+    
+    
+    
+	
+	<div>
+		
+			<div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+		
+	</div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spark/" <i class="fa fa-tag"></i> Spark</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/14/20180714真正意义的货币战争/" rel="next" title="真正意义上的货币战争">
+                <i class="fa fa-chevron-left"></i> 真正意义上的货币战争
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/26/20180925Spark与Hadoop哲学概念对比/" rel="prev" title="Spark与Hadoop哲学概念对比">
+                Spark与Hadoop哲学概念对比 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/author.jpg"
+                alt="余洋" />
+            
+              <p class="site-author-name" itemprop="name">余洋</p>
+              <p class="site-description motion-element" itemprop="description">Done is better than perfect</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">59</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/Hunglish" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:yu.panda.yang@gmail.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/sexyBoy/" target="_blank" title="知乎">
+                    
+                      <i class="fa fa-fw fa-twitter"></i>知乎</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+
+
+
+
+
+
+
+
+
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Spark框架基本概念"><span class="nav-number">1.</span> <span class="nav-text">Spark框架基本概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#spark设计思想"><span class="nav-number">2.</span> <span class="nav-text">spark设计思想</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#基础设施"><span class="nav-number">2.1.</span> <span class="nav-text">基础设施</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SparkContext"><span class="nav-number">2.2.</span> <span class="nav-text">SparkContext</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SparkEnv"><span class="nav-number">2.3.</span> <span class="nav-text">SparkEnv</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#储存体系"><span class="nav-number">2.4.</span> <span class="nav-text">储存体系</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#调度系统"><span class="nav-number">2.5.</span> <span class="nav-text">调度系统</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#计算引擎"><span class="nav-number">2.6.</span> <span class="nav-text">计算引擎</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Spark的物理架构"><span class="nav-number">3.</span> <span class="nav-text">Spark的物理架构</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">余洋</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">139.3k</span>
+  
+</div>
+
+
+<div class="powered-by">
+<i class="fa fa-user-md"></i><span id="busuanzi_container_site_uv">
+  本站访客数:<span id="busuanzi_value_site_uv"></span>
+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2018/09/26/20180925Spark基本概念哲学剖析/';
+          this.page.identifier = '2018/09/26/20180925Spark基本概念哲学剖析/';
+          this.page.title = 'Spark基本概念哲学剖析';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("KNWjeXgELCzkAyNEk1ha6qat-gzGzoHsz", "DVvprAeUgywXSDutYxf0yQA8");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+  
+
+
+  
+
+  
+
+  
+  <!-- 页面点击小红心 -->
+  <script type="text/javascript" src="/js/src/love.js"></script>
+</body>
+</html>
